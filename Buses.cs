@@ -3,16 +3,6 @@ using System;
 
 namespace Lennard_Jones
 {
-    //[InitializedBus]
-    //public interface Data : IBus
-    //{
-    //    int val { get; set;}
-    //    bool valid { get; set;}
-    //    int dt { get; set;}
-    //    int num_of_steps { get; set;}
-    //    int initial_temp { get; set;}
-    //    int num_of_bodies { get; set;}
-    //}
 
     public enum Constant : int 
     {
