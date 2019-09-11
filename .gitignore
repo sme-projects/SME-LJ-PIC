@@ -1,0 +1,9 @@
+
+# SME C# ignores
+obj/
+bin/
+
+# Generated output
+output/
+
+.vscode/
