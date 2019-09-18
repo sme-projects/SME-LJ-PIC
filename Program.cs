@@ -3,25 +3,31 @@ using SME;
 
 namespace Lennard_Jones
 {
-
-
     public class Force 
     {
+
         public ValBus input;
         public ValBus output;
 
-        public Force(float r, float sigma, float epsilon, ValBus input)
-        {
+        public Force(ValBus input)
+        {   
             this.input = input;
 
-            // Constant processes
-            var const_sigma = new Constants(sigma);
-            //Console.WriteLine("const sigma: {0}", sigma);
-            var const_epsilon = new Constants(epsilon);
-            var const_twelve = new Constants(12.0f);
-            var const_six = new Constants(6.0f);
-            var const_four = new Constants(4.0f);
 
+            // Constants
+            float SIGMA = 3.4f;
+            float EPSILON = 0.0103f;
+            float TWELVE = 12.0f;
+            float SIX = 6.0f;
+            float FOUR = 4.0f;
+            
+
+            // Constant processes
+            var const_sigma = new Constants(SIGMA);
+            var const_epsilon = new Constants(EPSILON);
+            var const_twelve = new Constants(TWELVE);
+            var const_six = new Constants(SIX);
+            var const_four = new Constants(FOUR);
 
             // Calculation processes
             var div         = new Div();
@@ -34,27 +40,30 @@ namespace Lennard_Jones
             var mulepsilon  = new Mul();
             var mul4        = new Mul();
 
-            
-            div.divisor             = input;
-            div.divident            = const_sigma.output;
-            ln.input                = div.quotient;
-            mul12.multiplicant      = ln.output;
-            mul12.multiplier        = const_twelve.output;
-            mul6.multiplicant       = ln.output;
-            mul6.multiplier         = const_six.output;
-            exp12.input             = mul12.product;
-            exp6.input              = mul6.product;
-            minus.minuend           = exp12.output;
-            minus.subtrahend        = exp6.output;
-            mulepsilon.multiplicant = const_epsilon.output;
-            mulepsilon.multiplier   = minus.difference;
-            mul4.multiplicant       = const_four.output;
-            mul4.multiplier         = mulepsilon.product;
-            output                  = mul4.product;
+            //Internal simulation process
+            var internal_simulator = new Internal_Force_Sim(SIGMA, EPSILON);
 
-            /* if(ln.input == div.quotient){
-                Console.WriteLine("");
-            } */
+            internal_simulator.input_r = input;
+            
+            /* NOTE: e^{x*ln*b} == b^x*/
+            div.divisor                         = input;
+            div.divident                        = const_sigma.output;
+            ln.input                            = div.quotient;
+            mul12.multiplicant                  = ln.output;
+            mul12.multiplier                    = const_twelve.output;
+            mul6.multiplicant                   = ln.output;
+            mul6.multiplier                     = const_six.output;
+            exp12.input                         = mul12.product;
+            exp6.input                          = mul6.product;
+            minus.minuend                       = exp12.output;
+            minus.subtrahend                    = exp6.output;
+            mulepsilon.multiplicant             = const_epsilon.output;
+            mulepsilon.multiplier               = minus.difference;
+            mul4.multiplicant                   = const_four.output;
+            mul4.multiplier                     = mulepsilon.product;
+            output                              = mul4.product;
+            internal_simulator.input_result     = mul4.product;
+
         }
     }
 
@@ -65,13 +74,12 @@ namespace Lennard_Jones
         {
             using(var sim = new Simulation())
             {
-                float SIGMA = 3.4f;
-                float EPSILON = 0.0103f;
                 float r = 1.0f;
-                var simulator = new Sim(r, SIGMA, EPSILON);
-                Force force = new Force(r, SIGMA, EPSILON, simulator.output);
-            
-                simulator.input = force.output;
+
+                //External simulation process
+                var external_force_simulator = new External_Force_Sim(r);
+                Force force = new Force(external_force_simulator.output);
+                external_force_simulator.input = force.output;
 
                 sim.Run();
             }

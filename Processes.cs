@@ -56,7 +56,6 @@ namespace Lennard_Jones
                 float float_minuend = Funcs.FromUint(minuend.val);
                 float float_subtrahend = Funcs.FromUint(subtrahend.val);
                 float float_difference = float_minuend - float_subtrahend;
-                //Console.WriteLine("difference value: {0}", float_difference);
                 difference.val = Funcs.FromFloat(float_difference);
                 difference.valid = true;
             } else {
@@ -82,9 +81,7 @@ namespace Lennard_Jones
         {
             if(input.valid){
                 float float_val = Funcs.FromUint(input.val);
-                //Console.WriteLine("exp double value: {0}", Math.Exp((double)float_val));
                 float float_result = (float) Math.Exp(float_val);
-                //Console.WriteLine("exp value: {0}", float_result);
                 output.val = Funcs.FromFloat(float_result);
                 output.valid = true;
             } else {
@@ -112,11 +109,9 @@ namespace Lennard_Jones
         protected override void OnTick()
         {
             if(multiplicant.valid && multiplier.valid){
-                //Console.WriteLine("running");
                 float float_multiplicant = Funcs.FromUint(multiplicant.val);
                 float float_multiplier = Funcs.FromUint(multiplier.val);
                 float float_product = float_multiplicant * float_multiplier;
-                //Console.WriteLine("product value: {0}", float_product);
                 product.val = Funcs.FromFloat(float_product);
                 product.valid = true;
             } else {
@@ -141,10 +136,8 @@ namespace Lennard_Jones
         protected override void OnTick()
         {
             if(input.valid){
-                //Console.WriteLine("running");
                 float float_val = Funcs.FromUint(input.val);
                 float float_result = (float) Math.Log(float_val);
-                //Console.WriteLine("ln value: {0}", float_result);
                 output.val = Funcs.FromFloat(float_result);
                 output.valid = true;
             } else {
@@ -173,15 +166,10 @@ namespace Lennard_Jones
 
         protected override void OnTick()
         {
-            /* if(divisor.valid){
-                Console.WriteLine("divisor val: {0}", divisor.valid);
-            } */
             if(divident.valid && divisor.valid){
-                
                 float float_divident = Funcs.FromUint(divident.val);
                 float float_divisor = Funcs.FromUint(divisor.val);
                 float float_quotient = float_divident / float_divisor;
-                //Console.WriteLine("quotient value: {0}", float_quotient);
                 quotient.val = Funcs.FromFloat(float_quotient);
                 quotient.valid = true;
             } else {
@@ -199,9 +187,7 @@ namespace Lennard_Jones
 
         public Constants(float elem)
         {
-            //Console.WriteLine("elem: {0}", elem);
             this.val = Funcs.FromFloat(elem);
-            //Console.WriteLine("val: {0}", val);
         }
 
         private uint val;
@@ -209,7 +195,6 @@ namespace Lennard_Jones
 
         protected override void OnTick()
         {
-            //Console.WriteLine("val in OnTick(): {0}", val);
             output.val = val;
             output.valid = true;
         }
