@@ -3,6 +3,49 @@ using SME;
 
 namespace Lennard_Jones
 {
+
+    public class Acceleration 
+    {
+        public ValBus input_pos1;
+        public ValBus input_pos2;
+        public ValBus output;
+
+        public Acceleration(ValBus input_pos1, ValBus input_pos2)
+        {
+            this.input_pos1 = input_pos1;
+            this.input_pos2 = input_pos2;
+
+            // Constants
+            float MASS_OF_ARGON = 39.948f;
+
+            // Constant processes
+            var const_mass_of_argon = new Constants(MASS_OF_ARGON);
+
+            //Internal simulation process
+            var internal_acceleration_sim = 
+                new Internal_Acceleration_Sim(MASS_OF_ARGON);
+            internal_acceleration_sim.input_pos1 = input_pos1;
+            internal_acceleration_sim.input_pos2 = input_pos2;
+            internal_acceleration_sim.input_result = const_mass_of_argon.output;
+            output = const_mass_of_argon.output;
+
+            // Calculation processes
+/*             var min         = new Min();
+            // Adding sqrt and mul maybe? 
+            Force force = new Force(min.difference);
+            var mul6        = new Mul();
+            var exp12       = new Exp();
+            var exp6        = new Exp();
+            var minus       = new Min();
+            var mulepsilon  = new Mul();
+            var mul4        = new Mul(); */
+
+
+            
+        }
+    }
+
+
     public class Force 
     {
 
@@ -41,9 +84,9 @@ namespace Lennard_Jones
             var mul4        = new Mul();
 
             //Internal simulation process
-            var internal_simulator = new Internal_Force_Sim(SIGMA, EPSILON);
+            var internal_force_simulation = new Internal_Force_Sim(SIGMA, EPSILON);
 
-            internal_simulator.input_r = input;
+            internal_force_simulation.input_r = input;
             
             /* NOTE: e^{x*ln*b} == b^x*/
             div.divisor                         = input;
@@ -62,7 +105,7 @@ namespace Lennard_Jones
             mul4.multiplicant                   = const_four.output;
             mul4.multiplier                     = mulepsilon.product;
             output                              = mul4.product;
-            internal_simulator.input_result     = mul4.product;
+            internal_force_simulation.input_result     = mul4.product;
 
         }
     }
@@ -74,13 +117,21 @@ namespace Lennard_Jones
         {
             using(var sim = new Simulation())
             {
-                float r = 1.0f;
+                float pos1 = 1.0f;
+                float pos2 = 5.0f;
 
                 //External simulation process
-                var external_force_simulator = new External_Force_Sim(r);
-                Force force = new Force(external_force_simulator.output);
-                external_force_simulator.input = force.output;
+                var external_acceleration_sim = new External_Acceleration_Sim(pos1, pos2);
+                Acceleration acceleration = 
+                    new Acceleration(external_acceleration_sim.output_pos1,
+                                     external_acceleration_sim.output_pos2);
+                external_acceleration_sim.input = acceleration.output;
 
+                //float MASS = 39.948f; // mass of agon in amu
+                //float pos1 = 1.0f;
+                //float pos2 = 5.0f;
+                
+                
                 sim.Run();
             }
         }
