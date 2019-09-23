@@ -30,6 +30,33 @@ namespace Lennard_Jones
         }
     }
 
+    // Negate process with floating point
+    // Input: An input (uint)
+    // Output: An output (uint)
+    // output = - input
+    // [ClockedProcess]
+    // public class Neg : SimpleProcess 
+    // {
+
+    //     [InputBus]
+    //     public ValBus input;
+
+    //     [OutputBus]
+    //     public ValBus output = Scope.CreateBus<ValBus>();
+
+    //     protected override void OnTick()
+    //     {
+    //         if(input.valid){
+    //             float float_input = Funcs.FromUint(input.val);
+    //             float float_output =  - float_input;
+    //             output.val = Funcs.FromFloat(float_output);
+    //             output.valid = true;
+    //         } else {
+    //             output.valid = false;
+    //         }
+    //     }
+    // }
+
     ////// FORCE CALCULATIONS //////
 
 

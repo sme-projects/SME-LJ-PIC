@@ -17,28 +17,36 @@ namespace Lennard_Jones
 
             // Constants
             float MASS_OF_ARGON = 39.948f;
+            float SIGMA = 3.4f;
+            float EPSILON = 0.0103f;
 
             // Constant processes
             var const_mass_of_argon = new Constants(MASS_OF_ARGON);
 
             //Internal simulation process
             var internal_acceleration_sim = 
-                new Internal_Acceleration_Sim(MASS_OF_ARGON);
+                new Internal_Acceleration_Sim(MASS_OF_ARGON, SIGMA, EPSILON);
             internal_acceleration_sim.input_pos1 = input_pos1;
             internal_acceleration_sim.input_pos2 = input_pos2;
             internal_acceleration_sim.input_result = const_mass_of_argon.output;
             output = const_mass_of_argon.output;
 
             // Calculation processes
-/*             var min         = new Min();
+             var min         = new Min();
             // Adding sqrt and mul maybe? 
             Force force = new Force(min.difference);
-            var mul6        = new Mul();
-            var exp12       = new Exp();
-            var exp6        = new Exp();
-            var minus       = new Min();
-            var mulepsilon  = new Mul();
-            var mul4        = new Mul(); */
+            // var mul        = new Mul();
+            //var div       = new Div();
+            var div_mass       = new Div();
+
+
+            min.minuend                             = input_pos2;
+            min.subtrahend                          = input_pos1;
+
+            div_mass.divident                       = force.output;
+            div_mass.divisor                        = const_mass_of_argon.output;
+            output                                  = div_mass.quotient;
+            internal_acceleration_sim.input_result  = div_mass.quotient;
 
 
             

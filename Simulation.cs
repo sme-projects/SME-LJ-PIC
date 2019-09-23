@@ -72,7 +72,7 @@ namespace Lennard_Jones
             }
             float float_val = Funcs.FromUint(input_result.val);
             
-            if(float_val == force_result) {
+            if(float_val != force_result) {
                     Console.WriteLine("Got {0}, expected {1}", float_val, force_result);
             }
         }
@@ -143,13 +143,17 @@ namespace Lennard_Jones
         public ValBus input_result;
 
         
-        public Internal_Acceleration_Sim(float mass_of_argon)
+        public Internal_Acceleration_Sim(float mass_of_argon, float sigma, float epsilon)
         {
 
-            this.MASS = Funcs.FromFloat(mass_of_argon);
+            this.MASS = mass_of_argon;
+            this.SIGMA = sigma;
+            this.EPSILON = epsilon;
         }
 
-        private uint MASS;
+        private float MASS;
+        private float SIGMA;
+        private float EPSILON;
 
         public override async System.Threading.Tasks.Task Run()
         {
@@ -160,22 +164,40 @@ namespace Lennard_Jones
             }
             float pos1 = Funcs.FromUint(input_pos1.val);
             float pos2 = Funcs.FromUint(input_pos2.val);
-            Console.WriteLine("pos1 : {0}, pos2 : {1}", pos1, pos2);
+            // Console.WriteLine("pos1 : {0}, pos2 : {1}", pos1, pos2);
 
             while(!input_result.valid) {
                     await ClockAsync();    
             }
-             float result = Funcs.FromUint(input_result.val);
-            Console.WriteLine("input_result (mass) : {0}", result);
+            float result = Funcs.FromUint(input_result.val);
+            // Console.WriteLine("input_result (mass) : {0}", result);
 
-            /* //Second test
+            //Acceleration test
             float r_x = pos2 - pos1;
-            // <- Force calculation
+            float force_result = force_calc(r_x);
             float force_x = force_result * r_x / r_x;
             float a1 = force_x / MASS;
             float a2 = (- force_x) / MASS;
-            //Console.WriteLine("Got {0}, expected {1}", float_val, force_result);
-             */
+            if (a1 != result || a2 != (result))
+            {
+                Console.WriteLine("Got {0}, expected {1} or {2}", result, a1, a2);
+            }
+        }
+
+        private float force_calc(float r)
+        {
+            float div = SIGMA / r;
+            float ln = (float) Math.Log(div);
+            float mul12 = ln * 12;
+            float mul6 = ln * 6;
+            float exp12 = (float) Math.Exp(mul12);
+            float exp6 = (float) Math.Exp(mul6);
+            float min = exp12 - exp6;
+            float fourepsilon = 4 * EPSILON;
+            float force_result = 4 * EPSILON 
+                                 * (((float) Math.Exp(((float)Math.Log(SIGMA  / r)) 
+                                 * 12)) - ((float) Math.Exp(((float)Math.Log(SIGMA  / r)) * 6)));
+            return force_result;
         }
 
     }
