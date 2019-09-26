@@ -1,10 +1,62 @@
 using SME;
 using SME.Components;
 using System;
-using System.Linq;
 
 namespace Lennard_Jones 
 {
+
+    public class External_Sim : SimulationProcess
+    {
+        [InputBus]
+        public ValBus input;
+
+        [OutputBus]
+        public TrueDualPortMemory<uint>.IControlB pos1_ramctrl;
+        [OutputBus]
+        public TrueDualPortMemory<uint>.IControlB pos2_ramctrl;
+        [OutputBus]
+        public ValBus output = Scope.CreateBus<ValBus>();
+
+        public External_Sim(float pos1, float pos2)
+        {
+            this.pos1 = Funcs.FromFloat(pos1);
+            this.pos2 = Funcs.FromFloat(pos2);
+            
+        }
+
+        private uint pos1;
+        private uint pos2;
+
+        public override async System.Threading.Tasks.Task Run() 
+        {
+            // Initial await
+            await ClockAsync();
+            uint[] tmp = {pos1, pos2};
+            for(int i = 0; i < tmp.Length; i++){
+                pos1_ramctrl.Enabled = true;
+                pos1_ramctrl.Address = i;
+                pos1_ramctrl.Data = tmp[i];
+                pos1_ramctrl.IsWriting = true;
+
+                pos2_ramctrl.Enabled = true;
+                pos2_ramctrl.Address = i;
+                pos2_ramctrl.Data = tmp[i];
+                pos2_ramctrl.IsWriting = true;
+                await ClockAsync();
+            }
+            pos1_ramctrl.Enabled = false;
+            pos2_ramctrl.Enabled = false;
+            output.val = (uint)tmp.Length;
+            output.valid = true;
+            await ClockAsync();
+            output.valid = false;
+
+            while(!input.valid) {
+                await ClockAsync();    
+            }
+        }
+
+    }
     
     // FORCE SIMULATIONS
 
@@ -75,6 +127,7 @@ namespace Lennard_Jones
             if(float_val != force_result) {
                     Console.WriteLine("Got {0}, expected {1}", float_val, force_result);
             }
+            
         }
 
         private float force_calc(float r)
@@ -96,7 +149,7 @@ namespace Lennard_Jones
 
     // ACCELERATION SIMULATIONS
 
-
+    // Currently not in use
     public class External_Acceleration_Sim : SimulationProcess 
     {
 
@@ -134,12 +187,11 @@ namespace Lennard_Jones
 
      public class Internal_Acceleration_Sim : SimulationProcess 
     {
-
         [InputBus]
         public ValBus input_pos1;
         [InputBus]
         public ValBus input_pos2;
-        [OutputBus]
+        [InputBus]
         public ValBus input_result;
 
         
@@ -157,11 +209,13 @@ namespace Lennard_Jones
 
         public override async System.Threading.Tasks.Task Run()
         {
-            
             await ClockAsync();
+            // await ClockAsync(); // Waiting 2 clock cycles for the data
             while(!input_pos1.valid && !input_pos2.valid) {
                     await ClockAsync();    
             }
+            
+
             float pos1 = Funcs.FromUint(input_pos1.val);
             float pos2 = Funcs.FromUint(input_pos2.val);
             // Console.WriteLine("pos1 : {0}, pos2 : {1}", pos1, pos2);
@@ -178,7 +232,7 @@ namespace Lennard_Jones
             float force_x = force_result * r_x / r_x;
             float a1 = force_x / MASS;
             float a2 = (- force_x) / MASS;
-            if (a1 != result || a2 != (result))
+            if (a1 != result && a2 != result)
             {
                 Console.WriteLine("Got {0}, expected {1} or {2}", result, a1, a2);
             }

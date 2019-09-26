@@ -4,6 +4,117 @@ using System;
 
 namespace Lennard_Jones 
 {
+
+
+ ////// RAM PROCESS //////
+
+    [ClockedProcess]
+    public class Ram : SimpleProcess
+    {
+        [InputBus]
+        public TrueDualPortMemory<uint>.IControlA ControlA = Scope.CreateBus<TrueDualPortMemory<uint>.IControlA>();
+        [InputBus]
+        public TrueDualPortMemory<uint>.IControlB ControlB = Scope.CreateBus<TrueDualPortMemory<uint>.IControlB>();
+        [OutputBus]
+        public TrueDualPortMemory<uint>.IReadResultA ReadResultA = Scope.CreateBus<TrueDualPortMemory<uint>.IReadResultA>();
+        [OutputBus]
+        public TrueDualPortMemory<uint>.IReadResultB ReadResultB = Scope.CreateBus<TrueDualPortMemory<uint>.IReadResultB>();
+
+        uint[] mem;
+
+        public Ram(uint size){
+            mem = new uint[size];
+        }
+
+        protected override void OnTick(){
+            if(ControlA.Enabled) {
+                ReadResultA.Data = mem[ControlA.Address];
+                if(ControlA.IsWriting) {
+                    mem[ControlA.Address] = ControlA.Data;
+                }
+            }
+            if(ControlB.Enabled) {
+                ReadResultB.Data = mem[ControlB.Address];
+                if(ControlB.IsWriting) {
+                    mem[ControlB.Address] = ControlB.Data;
+                }
+            }
+            
+        }
+    }
+
+
+ ////// RAM MANAGER //////
+    [ClockedProcess]
+    public class Manager : SimpleProcess
+    {
+        [InputBus]
+        public ValBus input;
+
+        [InputBus]
+        public TrueDualPortMemory<uint>.IReadResultA pos1_ramresult;
+        
+        [InputBus]
+        public TrueDualPortMemory<uint>.IReadResultA pos2_ramresult;
+
+        [OutputBus]
+        public ValBus pos1_output = Scope.CreateBus<ValBus>();
+
+        [OutputBus]
+        public ValBus pos2_output = Scope.CreateBus<ValBus>();
+
+        [OutputBus]
+        public TrueDualPortMemory<uint>.IControlA pos1_ramctrl;
+
+        [OutputBus]
+        public TrueDualPortMemory<uint>.IControlA pos2_ramctrl;
+
+
+        bool running = false;
+        int i = 0;
+        int j = 1;
+        uint length = 0;
+
+        protected override void OnTick() {
+            pos1_ramctrl.Enabled = false;
+            pos2_ramctrl.Enabled = false;
+            pos1_output.valid = false;
+            pos2_output.valid = false;
+
+            if(input.valid){
+                i = 0;
+                j = 1;
+                length = input.val; 
+                running = true;
+            }
+            if(running){
+                pos1_ramctrl.Enabled = i < length;
+                pos1_ramctrl.Address = i;
+                pos1_ramctrl.Data = 0;
+                pos1_ramctrl.IsWriting = false;
+                
+                pos2_ramctrl.Enabled = j < length;
+                pos2_ramctrl.Address = j;
+                pos2_ramctrl.Data = 0;
+                pos2_ramctrl.IsWriting = false;
+                if(i >= 2){
+                    pos1_output.val = pos1_ramresult.Data;
+                    pos2_output.val = pos2_ramresult.Data;
+                    pos1_output.valid = true;
+                    pos2_output.valid = true;
+                }
+                if(i >= length + 1) {
+                    running = false;
+                }
+                i++;
+            }
+            
+        }
+
+    }
+
+
+
     // Square root process with floating point
     // Input: An input (uint)
     // Output: An output (uint)
@@ -79,7 +190,7 @@ namespace Lennard_Jones
 
         protected override void OnTick()
         {
-            if(minuend.valid && subtrahend.valid){
+            if(minuend.valid && subtrahend.valid ){
                 float float_minuend = Funcs.FromUint(minuend.val);
                 float float_subtrahend = Funcs.FromUint(subtrahend.val);
                 float float_difference = float_minuend - float_subtrahend;

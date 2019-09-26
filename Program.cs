@@ -1,5 +1,6 @@
 ﻿using System;
 using SME;
+using SME.Components;
 
 namespace Lennard_Jones
 {
@@ -29,7 +30,7 @@ namespace Lennard_Jones
             internal_acceleration_sim.input_pos1 = input_pos1;
             internal_acceleration_sim.input_pos2 = input_pos2;
             internal_acceleration_sim.input_result = const_mass_of_argon.output;
-            output = const_mass_of_argon.output;
+            //output = const_mass_of_argon.output;
 
             // Calculation processes
              var min         = new Min();
@@ -128,18 +129,35 @@ namespace Lennard_Jones
                 float pos1 = 1.0f;
                 float pos2 = 5.0f;
 
-                //External simulation process
-                var external_acceleration_sim = new External_Acceleration_Sim(pos1, pos2);
-                Acceleration acceleration = 
-                    new Acceleration(external_acceleration_sim.output_pos1,
-                                     external_acceleration_sim.output_pos2);
-                external_acceleration_sim.input = acceleration.output;
+                // RAM
+                var position_ram1 = new TrueDualPortMemory<uint>(2);
+                var position_ram2 = new TrueDualPortMemory<uint>(2);
+                // Manager
+                var manager = new Manager();
 
-                //float MASS = 39.948f; // mass of agon in amu
-                //float pos1 = 1.0f;
-                //float pos2 = 5.0f;
                 
+
+                Acceleration acceleration = 
+                    new Acceleration(manager.pos1_output,
+                                     manager.pos2_output);
+
+
+                //External simulation process
+                var simulator = new External_Sim(pos1, pos2);
+
+                simulator.pos1_ramctrl = position_ram1.ControlB;
+                simulator.pos2_ramctrl = position_ram2.ControlB;
+                manager.input = simulator.output;
+
+                manager.pos1_ramctrl = position_ram1.ControlA;
+                manager.pos2_ramctrl = position_ram2.ControlA;
+                manager.pos1_ramresult = position_ram1.ReadResultA;
+                manager.pos2_ramresult = position_ram2.ReadResultA;
+
+                simulator.input = acceleration.output;
+                                
                 
+
                 sim.Run();
             }
         }
