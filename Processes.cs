@@ -71,17 +71,18 @@ namespace Lennard_Jones
 
 
         bool running = false;
+        int clock_count = 0;
         int i = 0;
         int j = 1;
         uint length = 0;
 
+
         protected override void OnTick() {
             pos1_ramctrl.Enabled = false;
             pos2_ramctrl.Enabled = false;
-            pos1_output.valid = false;
-            pos2_output.valid = false;
 
             if(input.valid){
+                clock_count = 0;
                 i = 0;
                 j = 1;
                 length = input.val; 
@@ -97,16 +98,24 @@ namespace Lennard_Jones
                 pos2_ramctrl.Address = j;
                 pos2_ramctrl.Data = 0;
                 pos2_ramctrl.IsWriting = false;
-                if(i >= 2){
+                if(clock_count >= 2){
                     pos1_output.val = pos1_ramresult.Data;
                     pos2_output.val = pos2_ramresult.Data;
                     pos1_output.valid = true;
                     pos2_output.valid = true;
                 }
-                if(i >= length + 1) {
+                
+                if(clock_count >= length + 1) {
                     running = false;
                 }
-                i++;
+                if(j >= length -1)
+                {
+                    i++;
+                    j = i + 1;
+                }else{
+                    j++;
+                }
+                clock_count++;
             }
             
         }
@@ -140,33 +149,6 @@ namespace Lennard_Jones
             }
         }
     }
-
-    // Negate process with floating point
-    // Input: An input (uint)
-    // Output: An output (uint)
-    // output = - input
-    // [ClockedProcess]
-    // public class Neg : SimpleProcess 
-    // {
-
-    //     [InputBus]
-    //     public ValBus input;
-
-    //     [OutputBus]
-    //     public ValBus output = Scope.CreateBus<ValBus>();
-
-    //     protected override void OnTick()
-    //     {
-    //         if(input.valid){
-    //             float float_input = Funcs.FromUint(input.val);
-    //             float float_output =  - float_input;
-    //             output.val = Funcs.FromFloat(float_output);
-    //             output.valid = true;
-    //         } else {
-    //             output.valid = false;
-    //         }
-    //     }
-    // }
 
     ////// FORCE CALCULATIONS //////
 

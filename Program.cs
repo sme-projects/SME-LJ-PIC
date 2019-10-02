@@ -36,8 +36,8 @@ namespace Lennard_Jones
              var min         = new Min();
             // Adding sqrt and mul maybe? 
             Force force = new Force(min.difference);
-            // var mul        = new Mul();
-            //var div       = new Div();
+            //var mul        = new Mul();
+            //var div        = new Div();
             var div_mass       = new Div();
 
 
@@ -128,10 +128,11 @@ namespace Lennard_Jones
             {
                 float pos1 = 1.0f;
                 float pos2 = 5.0f;
+                float pos3 = 10.0f;
 
                 // RAM
-                var position_ram1 = new TrueDualPortMemory<uint>(2);
-                var position_ram2 = new TrueDualPortMemory<uint>(2);
+                var position_ram1 = new TrueDualPortMemory<uint>(3);
+                var position_ram2 = new TrueDualPortMemory<uint>(3);
                 // Manager
                 var manager = new Manager();
 
@@ -143,7 +144,7 @@ namespace Lennard_Jones
 
 
                 //External simulation process
-                var simulator = new External_Sim(pos1, pos2);
+                var simulator = new External_Sim(pos1, pos2, pos3);
 
                 simulator.pos1_ramctrl = position_ram1.ControlB;
                 simulator.pos2_ramctrl = position_ram2.ControlB;
@@ -158,6 +159,7 @@ namespace Lennard_Jones
                                 
                 
 
+                // sim.Run(null, () => true);
                 sim.Run();
             }
         }

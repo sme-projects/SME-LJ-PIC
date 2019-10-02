@@ -1,6 +1,7 @@
 using SME;
 using SME.Components;
 using System;
+using System.Collections.Generic;
 
 namespace Lennard_Jones 
 {
@@ -17,21 +18,25 @@ namespace Lennard_Jones
         [OutputBus]
         public ValBus output = Scope.CreateBus<ValBus>();
 
-        public External_Sim(float pos1, float pos2)
+        
+
+        public External_Sim(float pos1, float pos2, float pos3)
         {
             this.pos1 = Funcs.FromFloat(pos1);
             this.pos2 = Funcs.FromFloat(pos2);
+            this.pos3 = Funcs.FromFloat(pos3);
             
         }
 
         private uint pos1;
         private uint pos2;
+        private uint pos3;
 
         public override async System.Threading.Tasks.Task Run() 
         {
             // Initial await
             await ClockAsync();
-            uint[] tmp = {pos1, pos2};
+            uint[] tmp = {pos1, pos2, pos3};
             for(int i = 0; i < tmp.Length; i++){
                 pos1_ramctrl.Enabled = true;
                 pos1_ramctrl.Address = i;
@@ -44,18 +49,41 @@ namespace Lennard_Jones
                 pos2_ramctrl.IsWriting = true;
                 await ClockAsync();
             }
+
+            bool running = true;
             pos1_ramctrl.Enabled = false;
             pos2_ramctrl.Enabled = false;
             output.val = (uint)tmp.Length;
             output.valid = true;
             await ClockAsync();
             output.valid = false;
+            // Calculating tuples for the check queue
+            Queue<(uint, uint)> position_queue = new Queue<(uint, uint)>();
+            for(int i = 0; i < tmp.Length; i++){
+                for(int j = i + 1; j < tmp.Length; j++){
+                    position_queue.Enqueue((tmp[i], tmp[j]));
+                }
+            }
+            while(running){
+                while(!input.valid) {
+                    await ClockAsync();    
+                }
+                // Dequeueing the data along to check the results against the C# calculation
+                (uint, uint) tuple = position_queue.Dequeue();
+                float pos1 = Funcs.FromUint(tuple.Item1);
+                float pos2 = Funcs.FromUint(tuple.Item2);
+                float acceleration_calc_result = Sim_Funcs.Acceleration_Calc(pos1, pos2);
+                float input_result = Funcs.FromUint(input.val);
+                if(acceleration_calc_result != input_result){
+                    Console.WriteLine("Acceleration result - Got {0}, expected {1}", input_result, acceleration_calc_result);
+                }
+                if (position_queue.Count == 0){
+                    running = false;
+                }
+                await ClockAsync();
 
-            while(!input.valid) {
-                await ClockAsync();    
             }
         }
-
     }
     
     // FORCE SIMULATIONS
@@ -67,8 +95,6 @@ namespace Lennard_Jones
         public ValBus input;
         [OutputBus]
         public ValBus output = Scope.CreateBus<ValBus>();
-        
-
 
         public External_Force_Sim(float r)
         {
@@ -80,7 +106,6 @@ namespace Lennard_Jones
         public override async System.Threading.Tasks.Task Run()
         {
             await ClockAsync();
-            // Simulation data for Force
             output.val = val;
             output.valid = true;
             while(!input.valid) {
@@ -111,39 +136,26 @@ namespace Lennard_Jones
 
         public override async System.Threading.Tasks.Task Run()
         {
-            // Data for checking result from Force
-            while(!input_r.valid) {
-                    await ClockAsync();    
+            Queue<float> input_queue = new Queue<float>();
+            while(true){
+                while(!input_r.valid) {
+                        await ClockAsync();    
+                }
+                float float_r = Funcs.FromUint(input_r.val);
+                 // Force test results
+                float force_result = Sim_Funcs.Force_Calc(float_r);
+                input_queue.Enqueue(force_result);
+                if(input_result.valid){
+                    float float_val = Funcs.FromUint(input_result.val);
+                    float calc_result = input_queue.Dequeue();
+                    if(float_val != calc_result) {
+                        Console.WriteLine("Force sim: Got {0}, expected {1}", float_val, calc_result);
+                    }
+                }
+                await ClockAsync();
             }
-            float float_r = Funcs.FromUint(input_r.val);
-            float force_result = force_calc(float_r);
-
-            // Getting data from Force process calculation
-            while(!input_result.valid) {
-                    await ClockAsync();    
-            }
-            float float_val = Funcs.FromUint(input_result.val);
+                
             
-            if(float_val != force_result) {
-                    Console.WriteLine("Got {0}, expected {1}", float_val, force_result);
-            }
-            
-        }
-
-        private float force_calc(float r)
-        {
-            float div = SIGMA / r;
-            float ln = (float) Math.Log(div);
-            float mul12 = ln * 12;
-            float mul6 = ln * 6;
-            float exp12 = (float) Math.Exp(mul12);
-            float exp6 = (float) Math.Exp(mul6);
-            float min = exp12 - exp6;
-            float fourepsilon = 4 * EPSILON;
-            float force_result = 4 * EPSILON 
-                                 * (((float) Math.Exp(((float)Math.Log(SIGMA  / r)) 
-                                 * 12)) - ((float) Math.Exp(((float)Math.Log(SIGMA  / r)) * 6)));
-            return force_result;
         }
     }
 
@@ -209,36 +221,45 @@ namespace Lennard_Jones
 
         public override async System.Threading.Tasks.Task Run()
         {
-            await ClockAsync();
-            // await ClockAsync(); // Waiting 2 clock cycles for the data
-            while(!input_pos1.valid && !input_pos2.valid) {
-                    await ClockAsync();    
+            Queue<float> input_queue = new Queue<float>();
+            while(true){
+                while(!input_pos1.valid && !input_pos2.valid) {
+                        await ClockAsync();    
+                }
+                float pos1 = Funcs.FromUint(input_pos1.val);
+                float pos2 = Funcs.FromUint(input_pos2.val);
+                //Acceleration test results
+                float acceleration_result = Sim_Funcs.Acceleration_Calc(pos1, pos2);
+                // Console.WriteLine("acceleration : {0}", acceleration_result);
+                input_queue.Enqueue(acceleration_result);
+                if(input_result.valid){
+                    float result = Funcs.FromUint(input_result.val);
+                    float calc_result = input_queue.Dequeue();
+                    if (calc_result != result){
+                        Console.WriteLine("Acceleration sim: Got {0}, expected {1}", result, calc_result);
+                    }
+                }
+                await ClockAsync();
             }
             
+        }
+    }
 
-            float pos1 = Funcs.FromUint(input_pos1.val);
-            float pos2 = Funcs.FromUint(input_pos2.val);
-            // Console.WriteLine("pos1 : {0}, pos2 : {1}", pos1, pos2);
+    public class Sim_Funcs
+    {
+        static float MASS_OF_ARGON = 39.948f;
+        static float SIGMA = 3.4f;
+        static float EPSILON = 0.0103f;
 
-            while(!input_result.valid) {
-                    await ClockAsync();    
-            }
-            float result = Funcs.FromUint(input_result.val);
-            // Console.WriteLine("input_result (mass) : {0}", result);
-
-            //Acceleration test
-            float r_x = pos2 - pos1;
-            float force_result = force_calc(r_x);
-            float force_x = force_result * r_x / r_x;
-            float a1 = force_x / MASS;
-            float a2 = (- force_x) / MASS;
-            if (a1 != result && a2 != result)
-            {
-                Console.WriteLine("Got {0}, expected {1} or {2}", result, a1, a2);
-            }
+        public static float Acceleration_Calc(float pos1, float pos2)
+        {
+            float r = pos2 - pos1;
+            float f = Force_Calc(r);
+            float result = f / MASS_OF_ARGON;
+            return result;
         }
 
-        private float force_calc(float r)
+        public static float Force_Calc(float r)
         {
             float div = SIGMA / r;
             float ln = (float) Math.Log(div);
@@ -253,6 +274,5 @@ namespace Lennard_Jones
                                  * 12)) - ((float) Math.Exp(((float)Math.Log(SIGMA  / r)) * 6)));
             return force_result;
         }
-
     }
 }
