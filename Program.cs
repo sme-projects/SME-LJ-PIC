@@ -11,6 +11,9 @@ namespace Lennard_Jones
         public ValBus input_pos2;
         public ValBus output;
 
+
+
+
         public Acceleration(ValBus input_pos1, ValBus input_pos2)
         {
             this.input_pos1 = input_pos1;
@@ -29,8 +32,6 @@ namespace Lennard_Jones
                 new Internal_Acceleration_Sim(MASS_OF_ARGON, SIGMA, EPSILON);
             internal_acceleration_sim.input_pos1 = input_pos1;
             internal_acceleration_sim.input_pos2 = input_pos2;
-            internal_acceleration_sim.input_result = const_mass_of_argon.output;
-            //output = const_mass_of_argon.output;
 
             // Calculation processes
              var min         = new Min();
@@ -126,15 +127,16 @@ namespace Lennard_Jones
         {
             using(var sim = new Simulation())
             {
-                float pos1 = 1.0f;
-                float pos2 = 5.0f;
-                float pos3 = 10.0f;
+                float[] positions = {1.0f, 5.0f, 10.0f};
 
                 // RAM
-                var position_ram1 = new TrueDualPortMemory<uint>(3);
-                var position_ram2 = new TrueDualPortMemory<uint>(3);
+                var position_ram1 = new TrueDualPortMemory<uint>(positions.Length);
+                var position_ram2 = new TrueDualPortMemory<uint>(positions.Length);
+                var acceleration_ram = new TrueDualPortMemory<uint>(positions.Length);
                 // Manager
                 var manager = new Manager();
+                uint cache_size = 4;
+                var acceleration_manager = new AccelerationResultManager(cache_size);
 
                 
 
@@ -144,7 +146,7 @@ namespace Lennard_Jones
 
 
                 //External simulation process
-                var simulator = new External_Sim(pos1, pos2, pos3);
+                var simulator = new External_Sim(positions);
 
                 simulator.pos1_ramctrl = position_ram1.ControlB;
                 simulator.pos2_ramctrl = position_ram2.ControlB;
@@ -155,9 +157,13 @@ namespace Lennard_Jones
                 manager.pos1_ramresult = position_ram1.ReadResultA;
                 manager.pos2_ramresult = position_ram2.ReadResultA;
 
-                simulator.input = acceleration.output;
-                                
-                
+                acceleration_manager.acceleration_input = acceleration.output;
+                acceleration_manager.manager_input = manager.acceleration_ready_output;
+                acceleration_manager.acc_ramctrl = acceleration_ram.ControlA;
+                acceleration_manager.acc_ramresult = acceleration_ram.ReadResultA;
+                simulator.acc_ramresult = acceleration_ram.ReadResultB;
+                simulator.acc_ramctrl = acceleration_ram.ControlB;
+                simulator.input = acceleration_manager.output;
 
                 // sim.Run(null, () => true);
                 sim.Run();

@@ -62,6 +62,9 @@ namespace Lennard_Jones
 
         [OutputBus]
         public ValBus pos2_output = Scope.CreateBus<ValBus>();
+        
+        [OutputBus]
+        public ValBus acceleration_ready_output = Scope.CreateBus<ValBus>();
 
         [OutputBus]
         public TrueDualPortMemory<uint>.IControlA pos1_ramctrl;
@@ -81,12 +84,17 @@ namespace Lennard_Jones
             pos1_ramctrl.Enabled = false;
             pos2_ramctrl.Enabled = false;
 
+            // The input is only valid once for each simulation. 
             if(input.valid){
                 clock_count = 0;
                 i = 0;
                 j = 1;
                 length = input.val; 
                 running = true;
+                acceleration_ready_output.val = length;
+                acceleration_ready_output.valid = true;
+            }else {
+                acceleration_ready_output.valid = false;
             }
             if(running){
                 pos1_ramctrl.Enabled = i < length;
@@ -116,6 +124,83 @@ namespace Lennard_Jones
                     j++;
                 }
                 clock_count++;
+            }
+            
+        }
+
+    }
+
+     ////// RAM MANAGER //////
+    [ClockedProcess]
+    public class AccelerationResultManager : SimpleProcess
+    {
+        [InputBus]
+        public ValBus manager_input;
+        [InputBus]
+        public ValBus acceleration_input;
+        
+        [InputBus]
+        public TrueDualPortMemory<uint>.IReadResultA acc_ramresult;
+        
+        [OutputBus]
+        public TrueDualPortMemory<uint>.IControlA acc_ramctrl;
+
+        [OutputBus]
+        public ValBus output = Scope.CreateBus<ValBus>();
+
+        float[] cache_A;
+        float[] cache_B;
+        float[] cache_C;
+        int cache_size;
+
+        public AccelerationResultManager(uint size){
+            cache_A = new float[size];
+            cache_B = new float[size];
+            cache_C = new float[size];
+            cache_size = (int)size;
+
+        }
+
+        // bool write_cache_A = false;
+        // bool write_cache_B = false;
+        // bool write_cache_C = false;
+        // uint index_cache_A = 0;
+        // uint index_cache_B = 0;
+        // uint index_cache_C = 0;
+        // uint dirty_counter = 3;
+        int i = 0;
+        // int j = 0;
+        uint length = 0;
+
+        bool running = false;
+
+
+        protected override void OnTick() {
+            if(manager_input.valid){
+                length = manager_input.val;
+                output.valid = false;
+                running = true;
+                // dirty_counter = 3;
+                // // clear caches
+                // Array.Clear(cache_A, 0, cache_size);
+                // Array.Clear(cache_B, 0, cache_size);
+                // Array.Clear(cache_C, 0, cache_size);
+
+            }
+            // acc_ramctrl.Enabled = false;
+
+            if(acceleration_input.valid && running){
+                acc_ramctrl.Enabled = i < length;
+                acc_ramctrl.Address = i;
+                acc_ramctrl.Data = acceleration_input.val;
+                acc_ramctrl.IsWriting = true;
+                i++;
+
+            } 
+            if(running && i >= length + 2){
+
+                output.valid = true;
+                running = false;
             }
             
         }
