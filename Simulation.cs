@@ -12,9 +12,11 @@ namespace Lennard_Jones
         public ValBus input;
     
         [InputBus]
-        public TrueDualPortMemory<uint>.IReadResultB acc_ramresult;
+        public RamResultUint acc_ramresult;
+        
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlB acc_ramctrl;
+        public RamCtrlUint acc_ramctrl;
+        
         
         [OutputBus]
         public TrueDualPortMemory<uint>.IControlB pos1_ramctrl;
@@ -58,38 +60,69 @@ namespace Lennard_Jones
             await ClockAsync();
             output.valid = false;
             // Calculating tuples for the check queue
-            Queue<(uint, uint)> position_queue = new Queue<(uint, uint)>();
+            float[] accelerations = new float[positions.Length];
             for(int i = 0; i < positions.Length; i++){
                 for(int j = i + 1; j < positions.Length; j++){
-                    position_queue.Enqueue((Funcs.FromFloat(positions[i]), Funcs.FromFloat(positions[j])));
+                    float result = Sim_Funcs.Acceleration_Calc(positions[i], positions[j]);
+                    accelerations[i] += result;
+                    accelerations[j] += - result;
                 }
             }
-            int k = 0;
+            // uint k = 0;
+
             while(running){
-                while(!input.valid) {
-                    await ClockAsync();    
-                }
-                acc_ramctrl.Enabled = k < positions.Length;
-                acc_ramctrl.Address = k;
+            //     await ClockAsync();  
+            // }
+                uint i = 0;
+                int data_size = positions.Length;
+                acc_ramctrl.Enabled = true;
                 acc_ramctrl.Data = 0;
                 acc_ramctrl.IsWriting = false;
-                await ClockAsync();
-                await ClockAsync();
-                float input_result = Funcs.FromUint(acc_ramresult.Data);
-                // Dequeueing the data along to check the results against the C# calculation
-                (uint, uint) tuple = position_queue.Dequeue();
-                float pos1 = Funcs.FromUint(tuple.Item1);
-                float pos2 = Funcs.FromUint(tuple.Item2);
-                float acceleration_calc_result = Sim_Funcs.Acceleration_Calc(pos1, pos2);
-                if(acceleration_calc_result != input_result){
-                    Console.WriteLine("Acceleration result - Got {0}, expected {1}", input_result, acceleration_calc_result);
+                while(i < data_size){
+                    Console.WriteLine("i : {0}", i);
+                    while(!input.valid) {
+                        await ClockAsync();    
+                    }
+                    uint size = input.val;
+                    for(uint j = 0; j < size+1; j++){
+                        acc_ramctrl.Address = i + j;
+                        await ClockAsync();
+                        if(j >= 1){
+                            float input_result = Funcs.FromUint(acc_ramresult.Data);
+                            if(accelerations[i+j-1] != input_result)
+
+                                 Console.WriteLine("Acceleration result - Got {0}, expected {1} at {2}", 
+                                 input_result, accelerations[i+j-1], i+j-1);
+                            // Console.WriteLine("result is: {0}", Funcs.FromUint(acc_ramresult.Data));
+                        }
+                    }
+                    i += size;
+
                 }
-                if(position_queue.Count == 0){
-                    running = false;
-                }
-                k++;
                 
-                await ClockAsync();
+                // TODO: Must be able to repeat which is not possible now
+                running = false;
+                // if(Funcs.FromUint(acc_ramresult.Data) == -2460.20117){
+                //     running = false;
+                // }
+                // await ClockAsync();
+                // await ClockAsync();
+                
+                // // float input_result = Funcs.FromUint(acc_ramresult.Data);
+                // // Dequeueing the data along to check the results against the C# calculation
+                // (uint, uint) tuple = position_queue.Dequeue();
+                // float acceleration_calc_result = Sim_Funcs.Acceleration_Calc(pos1, pos2);
+                // if(acceleration_calc_result != input_result){
+                //     Console.WriteLine("Acceleration result - Got {0}, expected {1}", input_result, acceleration_calc_result);
+                // }else{
+                //     Console.WriteLine("Acceleration result - Got {0}, expected {1}", input_result, acceleration_calc_result);
+                // }
+                // if(position_queue.Count == 0){
+                //     running = false;
+                // }
+                // k++;
+                
+                // await ClockAsync();
             }
         }
     }

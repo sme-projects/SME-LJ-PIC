@@ -127,17 +127,23 @@ namespace Lennard_Jones
         {
             using(var sim = new Simulation())
             {
-                float[] positions = {1.0f, 5.0f, 10.0f};
+                uint size = 20;
+                float[] positions = new float[size];
+                // size : 12
+                for(int i = 0; i < size; i++){
+                    positions[i] = i+1;
+                    // Console.WriteLine(i);
+                }
 
                 // RAM
                 var position_ram1 = new TrueDualPortMemory<uint>(positions.Length);
                 var position_ram2 = new TrueDualPortMemory<uint>(positions.Length);
-                var acceleration_ram = new TrueDualPortMemory<uint>(positions.Length);
+                var acceleration_ram = new AccelerationDataRam((uint)positions.Length);
                 // Manager
                 var manager = new Manager();
                 uint cache_size = 4;
                 var acceleration_manager = new AccelerationResultManager(cache_size);
-
+                
                 
 
                 Acceleration acceleration = 
@@ -146,24 +152,26 @@ namespace Lennard_Jones
 
 
                 //External simulation process
-                var simulator = new External_Sim(positions);
+                var external_simulator = new External_Sim(positions);
 
-                simulator.pos1_ramctrl = position_ram1.ControlB;
-                simulator.pos2_ramctrl = position_ram2.ControlB;
-                manager.input = simulator.output;
+                external_simulator.pos1_ramctrl = position_ram1.ControlB;
+                external_simulator.pos2_ramctrl = position_ram2.ControlB;
+                manager.input = external_simulator.output;
 
                 manager.pos1_ramctrl = position_ram1.ControlA;
                 manager.pos2_ramctrl = position_ram2.ControlA;
                 manager.pos1_ramresult = position_ram1.ReadResultA;
                 manager.pos2_ramresult = position_ram2.ReadResultA;
 
+                // var testprocess = new Test();
                 acceleration_manager.acceleration_input = acceleration.output;
+                // acceleration_manager.acceleration_input = testprocess.output;
                 acceleration_manager.manager_input = manager.acceleration_ready_output;
                 acceleration_manager.acc_ramctrl = acceleration_ram.ControlA;
                 acceleration_manager.acc_ramresult = acceleration_ram.ReadResultA;
-                simulator.acc_ramresult = acceleration_ram.ReadResultB;
-                simulator.acc_ramctrl = acceleration_ram.ControlB;
-                simulator.input = acceleration_manager.output;
+                external_simulator.acc_ramctrl = acceleration_ram.ControlB;
+                external_simulator.acc_ramresult = acceleration_ram.ReadResultB;
+                external_simulator.input = acceleration_manager.output;
 
                 // sim.Run(null, () => true);
                 sim.Run();
