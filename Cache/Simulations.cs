@@ -8,7 +8,7 @@ namespace Cache{
     public class Testing_Simulator : SimulationProcess
     {
         [InputBus]
-        public ValBus acceleration_result;
+        public FlagBus acceleration_result;
     
         [InputBus]
         public RamResultInt acc_ramresult;
@@ -24,12 +24,14 @@ namespace Cache{
 
         
 
-        public Testing_Simulator(int[] positions)
+        public Testing_Simulator(int[] positions, int cache_size)
         {
             this.positions = positions;
+            this.size = cache_size;
         }
 
         private int[] positions;
+        private int size;
 
         public override async System.Threading.Tasks.Task Run() 
         {
@@ -54,7 +56,7 @@ namespace Cache{
             int i = 0;
             int j = 0;
             int data_size = positions.Length;
-            int size = 0;
+            // int size = 0;
             int ready_to_read = 0;
 
             while(running){
@@ -71,13 +73,12 @@ namespace Cache{
                 acc_ramctrl.Data = 0;
                 acc_ramctrl.IsWriting = false;
                 if(acceleration_result.valid){
-                    size = acceleration_result.val;
                     ready_to_read += size;
                 }
 
                 if(i-j >= 2 || i >= positions.Length){
                     int input_result = acc_ramresult.Data;
-                    if(test_accelerations[j] == input_result)
+                    if(test_accelerations[j] != input_result)
                         Console.WriteLine("Acceleration result - Got {0}, expected {1} at {2}",
                                 input_result, test_accelerations[j], j);
                     j++;

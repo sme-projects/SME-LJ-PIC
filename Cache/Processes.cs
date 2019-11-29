@@ -21,7 +21,7 @@ namespace Cache{
         public RamCtrlArray acc_ramctrl;
 
         [OutputBus]
-        public ValBus output = Scope.CreateBus<ValBus>();
+        public FlagBus output = Scope.CreateBus<FlagBus>();
 
         int[] cache_A1;
         int[] cache_A2;
@@ -80,10 +80,8 @@ namespace Cache{
         int received_data_address;
         bool last_cache_blocks;
         
-        // TODO: Make the output.val a bool to show if we are finished writing
-        // instead of having it sent the size. Vivado might be able to optimize
-        // it out but do not count on it. The tester should then know the cache size
-        // and be able to increment the counter by it self when the val flag is set
+        int count = 0;
+        
         protected override void OnTick() {
             if(ready.valid){
                 
@@ -114,6 +112,7 @@ namespace Cache{
 
                 last_cache_index_i = 0;
                 last_cache_index_j = 0;
+                
                 
                 /*  NOTE: The Acceleration manager will never write to more than 
                     there are amount of data. Therefore it is only a problem when 
@@ -235,7 +234,6 @@ namespace Cache{
                                 write_cache_B = last_cache_index_i == index_cache_B;
                                 write_cache_C = last_cache_index_i == index_cache_C;
                                 output.valid = true;
-                                output.val = cache_size;
                             }
                         }
                     }
@@ -304,7 +302,6 @@ namespace Cache{
                             acc_ramctrl.IsWriting = true;
                         }
                         output.valid = true;
-                        output.val = cache_size;
                     }
                     write_cache = false;
                 } else if(receive_cache){
@@ -451,7 +448,6 @@ namespace Cache{
                     write_cache_B = current_cache_index_i == index_cache_B;
                     write_cache_C = current_cache_index_i == index_cache_C;
                     output.valid = true;
-                    output.val = cache_size;
                     if (write_cache_B){
                         for (int j = 0; j < cache_size; j++)
                             acc_ramctrl.Data[j] = cache_B[j];
@@ -473,7 +469,9 @@ namespace Cache{
                 }
                 running = false;
             }
-
+            
+            Console.WriteLine("Clock cycle count is: {0}", count);
+            count++;
         }
     }
 

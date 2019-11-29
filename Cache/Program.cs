@@ -14,14 +14,15 @@ namespace Cache
                 for(int i = 0; i < size; i++){
                     positions[i] = (int)i+1;
                 }
+                int cache_size = 4;
 
                 //External simulation process
-                var testing_simulator = new Testing_Simulator(positions);
+                var testing_simulator = new Testing_Simulator(positions, cache_size);
 
                 // RAM
                 var acceleration_ram = new AccelerationDataRam(positions.Length);
                 
-                int cache_size = 4;
+
                 var acceleration_cache = new AccelerationCache(cache_size);
                 
                 

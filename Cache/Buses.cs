@@ -13,6 +13,13 @@ namespace Cache
         bool valid { get; set; }
     }
 
+    [InitializedBus]
+    public interface FlagBus : IBus
+    {
+        [InitialValue(false)]
+        bool valid { get; set; }
+    }
+
 
     [InitializedBus]
     public interface RamCtrlInt : IBus
