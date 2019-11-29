@@ -41,7 +41,7 @@ namespace Cache{
             await ClockAsync();
             acceleration_ready.valid = false;
 
-            int count = 0;
+            int count = 1;
             int[] test_accelerations = new int[positions.Length];
             for(int k = 0; k < positions.Length; k++){
                 for(int n = k + 1; n < positions.Length; n++){
@@ -50,7 +50,7 @@ namespace Cache{
                     count++;
                 }
             }
-            int input = 0;
+            int input = 1;
             int i = 0;
             int j = 0;
             int data_size = positions.Length;

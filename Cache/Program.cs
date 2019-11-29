@@ -9,7 +9,7 @@ namespace Cache
         {
             using(var sim = new Simulation()){
 
-                int size = 16;
+                int size = 40;
                 int[] positions = new int[size];
                 for(int i = 0; i < size; i++){
                     positions[i] = (int)i+1;
@@ -35,10 +35,10 @@ namespace Cache
                 testing_simulator.acceleration_result = acceleration_cache.output;
 
                 sim
-                .AddTopLevelInputs(acceleration_cache.acceleration_input, acceleration_cache.ready, testing_simulator.acc_ramctrl)
-                .AddTopLevelOutputs(testing_simulator.acc_ramresult, acceleration_cache.output)
-                .BuildCSVFile()
-                .BuildVHDL()
+                // .AddTopLevelInputs(acceleration_cache.acceleration_input, acceleration_cache.ready, testing_simulator.acc_ramctrl)
+                // .AddTopLevelOutputs(testing_simulator.acc_ramresult, acceleration_cache.output)
+                // .BuildCSVFile()
+                // .BuildVHDL()
                 .Run()
                 ;
             }

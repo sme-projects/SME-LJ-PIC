@@ -135,7 +135,7 @@ namespace Cache{
             }
 
             if(acceleration_input.valid && running){
-                
+
                 output.valid = false;
                 
                 // Find current i and j
@@ -352,21 +352,29 @@ namespace Cache{
                                 //  Written cache A1
                                 if(index_cache_B == index_cache_A2){
                                     cache_B[j] = acc_ramresult.Data[j];
-                                    index_cache_B = received_data_address;
                                 } else if(index_cache_C == index_cache_A2){
                                     cache_C[j] = acc_ramresult.Data[j];
-                                    index_cache_C = received_data_address;
                                 }
                             }else{
                                 // Written cache A2
                                 if(index_cache_B == index_cache_A1){
                                     cache_B[j] = acc_ramresult.Data[j];
-                                    index_cache_B = received_data_address;
                                 } else if(index_cache_C == index_cache_A1){
                                     cache_C[j] = acc_ramresult.Data[j];
-                                    index_cache_C = received_data_address;
                                 }
                             }
+                        }
+                        // Update cache index
+                        if(!cache_A1_or_A2){
+                            if(index_cache_B == index_cache_A2)
+                                index_cache_B = received_data_address;
+                            else if(index_cache_C == index_cache_A2)
+                                index_cache_C = received_data_address;
+                        }else{
+                            if(index_cache_B == index_cache_A1)
+                                index_cache_B = received_data_address;
+                            else if(index_cache_C == index_cache_A1)
+                                index_cache_C = received_data_address;
                         }
                         write_cache_A = false;
                     }
@@ -438,7 +446,7 @@ namespace Cache{
                 // write to RAM since the loop will not continue after the last
                 // elements
                 if (current_i == amount_of_data - 2){
-                    Console.WriteLine("Finished acceleration accumulation");
+                    // Console.WriteLine("Finished acceleration accumulation");
                     
                     write_cache_B = current_cache_index_i == index_cache_B;
                     write_cache_C = current_cache_index_i == index_cache_C;
