@@ -229,6 +229,12 @@ namespace Cache{
                                 write_cache_A = true;
                                 write_cache_B = false;
                                 write_cache_C = false;
+                                // If only two caches it is necessary to change
+                                // cache here, so the right cache is written to 
+                                // ram
+                                if(amount_of_data <= cache_size * 2){
+                                    cache_A1_or_A2 = !cache_A1_or_A2;
+                                }
                             }else{
                                 write_cache = true;
                                 write_cache_B = last_cache_index_i == index_cache_B;
@@ -239,6 +245,12 @@ namespace Cache{
                     }
 
                     if(dirty_blocks < number_of_blocks){
+                        dirty_blocks++;
+                    }
+                }
+                // TODO: Should be rewritten for better solution
+                if(amount_of_data <= cache_size){
+                    if(current_j == amount_of_data - 1 && current_i == 0){
                         dirty_blocks++;
                     }
                 }
@@ -447,6 +459,7 @@ namespace Cache{
                     
                     write_cache_B = current_cache_index_i == index_cache_B;
                     write_cache_C = current_cache_index_i == index_cache_C;
+                    write_cache_A = current_cache_index_i == index_cache_A1 || current_cache_index_i == index_cache_A2;
                     output.valid = true;
                     if (write_cache_B){
                         for (int j = 0; j < cache_size; j++)
@@ -465,12 +478,28 @@ namespace Cache{
                         acc_ramctrl.IsWriting = true;
 
                     }
+                    else if (write_cache_A && cache_A1_or_A2){
+                        for (int j = 0; j < cache_size; j++)
+                            acc_ramctrl.Data[j] = cache_A1[j];
+                
+                        acc_ramctrl.Enabled = true;
+                        acc_ramctrl.Address = index_cache_A1;
+                        acc_ramctrl.IsWriting = true;
+                    }
+                    else if (write_cache_A && !cache_A1_or_A2){
+                        for (int j = 0; j < cache_size; j++)
+                            acc_ramctrl.Data[j] = cache_A2[j];
+                
+                        acc_ramctrl.Enabled = true;
+                        acc_ramctrl.Address = index_cache_A2;
+                        acc_ramctrl.IsWriting = true;
+                    }
                     write_cache = false;
                 }
                 running = false;
             }
             
-            Console.WriteLine("Clock cycle count is: {0}", count);
+            // Console.WriteLine("Clock cycle count is: {0}", count);
             count++;
         }
     }

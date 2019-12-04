@@ -47,13 +47,13 @@ namespace Cache
         int Address { get; set; }
         [InitialValue(false)]
         bool IsWriting { get; set; }
-        [FixedArrayLength(4)] // width of array bus
+        [FixedArrayLength((int)Cache_size.n)] // width of array bus
         IFixedArray<int> Data { get; set; }
     }
 
     public interface RamResultArray : IBus
     {
-        [FixedArrayLength(4)] // width of array bus
+        [FixedArrayLength((int)Cache_size.n)] // width of array bus
         IFixedArray<int> Data { get; set; }
     }
 
