@@ -1,7 +1,7 @@
 using SME;
 using System;
 
-namespace Lennard_Jones
+namespace Deflib
 {
 
     [InitializedBus]
@@ -9,6 +9,13 @@ namespace Lennard_Jones
     {
         [InitialValue(0)]
         uint val { get; set; }
+        [InitialValue(false)]
+        bool valid { get; set; }
+    }
+
+    [InitializedBus]
+    public interface FlagBus : IBus
+    {
         [InitialValue(false)]
         bool valid { get; set; }
     }
@@ -40,13 +47,13 @@ namespace Lennard_Jones
         uint Address { get; set; }
         [InitialValue(false)]
         bool IsWriting { get; set; }
-        [FixedArrayLength(4)] // width of array bus
+        [FixedArrayLength((int)Cache_size.n)] // width of array bus
         IFixedArray<uint> Data { get; set; }
     }
 
     public interface RamResultArray : IBus
     {
-        [FixedArrayLength(4)] // width of array bus
+        [FixedArrayLength((int)Cache_size.n)] // width of array bus
         IFixedArray<uint> Data { get; set; }
     }
 
