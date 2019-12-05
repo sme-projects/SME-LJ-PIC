@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="/home/albt/git/sme/src/SME/SME.csproj" />
+    <ProjectReference Include="/home/albt/git/sme/src/SME.Tracer/SME.Tracer.csproj" />
+    <ProjectReference Include="/home/albt/git/sme/src/SME.VHDL/SME.VHDL.csproj" />
+    
+    <ProjectReference Include="../Deflib/Deflib.csproj"/>
+  </ItemGroup>
+
+</Project>
