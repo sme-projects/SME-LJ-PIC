@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <RootNamespace>Lennard_Jones</RootNamespace>
+    <StartupObject>Lennard_Jones.Program</StartupObject>
+    <!-- <DefaultItemExcludes>$(DefaultItemExcludes);Cache\**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);Deflib\**</DefaultItemExcludes> -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="/home/albt/git/sme/src/SME/SME.csproj" />
+    <ProjectReference Include="/home/albt/git/sme/src/SME.Tracer/SME.Tracer.csproj" />
+    <ProjectReference Include="/home/albt/git/sme/src/SME.VHDL/SME.VHDL.csproj" />
+    
+    <ProjectReference Include="../Cache/Cache.csproj" />
+    <ProjectReference Include="../Deflib/Deflib.csproj" />
+    <ProjectReference Include="../Acceleration/Acceleration.csproj" />
+  </ItemGroup>
+
+</Project>
