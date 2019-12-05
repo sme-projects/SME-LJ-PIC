@@ -1,5 +1,6 @@
 using SME;
 using System;
+using Deflib;
 
 
 namespace Cache{
@@ -23,19 +24,19 @@ namespace Cache{
         [OutputBus]
         public FlagBus output = Scope.CreateBus<FlagBus>();
 
-        int[] cache_A1;
-        int[] cache_A2;
-        int[] cache_B;
-        int[] cache_C;
+        float[] cache_A1;
+        float[] cache_A2;
+        float[] cache_B;
+        float[] cache_C;
         
-        int cache_size;
+        uint cache_size;
 
 
-        public AccelerationCache(int size){
-            cache_A1 = new int[size];
-            cache_A2 = new int[size];
-            cache_B = new int[size];
-            cache_C = new int[size];
+        public AccelerationCache(uint size){
+            cache_A1 = new float[size];
+            cache_A2 = new float[size];
+            cache_B = new float[size];
+            cache_C = new float[size];
             
             cache_size = size;
 
@@ -47,40 +48,40 @@ namespace Cache{
         bool write_cache_A = false;
         bool write_cache_B = false;
         bool write_cache_C = false;
-        int index_cache_A1 = 0;
-        int index_cache_A2 = 0;
-        int index_cache_B = 1;
-        int index_cache_C = 2;
-        int amount_of_data = 0;
+        uint index_cache_A1 = 0;
+        uint index_cache_A2 = 0;
+        uint index_cache_B = 1;
+        uint index_cache_C = 2;
+        uint amount_of_data = 0;
 
         bool cache_A1_or_A2 = false;
         bool copy_cache_A = false;
 
         bool running = false;
-        int current_i = 0;
-        int current_j = 0;
+        uint current_i = 0;
+        uint current_j = 0;
         
         // counting the index of blocks we have read from RAM
         int dirty_blocks = 0;
         
-        int number_of_blocks = 0;
-        int next_cache_address = 0;
+        uint number_of_blocks = 0;
+        uint next_cache_address = 0;
         
 
         bool initial_clock_cycle = false;
 
-        int current_cache_index_i;
-        int current_cache_index_j;
-        int current_index_i;
-        int current_index_j;
+        uint current_cache_index_i;
+        uint current_cache_index_j;
+        uint current_index_i;
+        uint current_index_j;
 
-        int last_cache_index_i;
-        int last_cache_index_j;
+        uint last_cache_index_i;
+        uint last_cache_index_j;
 
-        int received_data_address;
+        uint received_data_address;
         bool last_cache_blocks;
         
-        int count = 0;
+        uint count = 0;
         
         protected override void OnTick() {
             if(ready.valid){
@@ -154,8 +155,8 @@ namespace Cache{
                 // last clock cycle result
                 last_cache_index_i = current_cache_index_i;
                 last_cache_index_j = current_cache_index_j;
-                int last_index_i = current_index_i;
-                int last_index_j = current_index_j;
+                uint last_index_i = current_index_i;
+                uint last_index_j = current_index_j;
 
                 // Calculate current cacheblock
                 current_cache_index_i = current_i / cache_size;
@@ -216,7 +217,7 @@ namespace Cache{
                     // At the last 3 cache blocks before the end of data
                     // This we already have in cache and therefore we do not
                     // need to write or request the data. 
-                    if(current_cache_index_i >= number_of_blocks - 3){
+                    if(current_cache_index_i >= (int)number_of_blocks - 3){
                         request_cache = false;
                         write_cache = false;
                         write_cache_A = false;
@@ -276,7 +277,7 @@ namespace Cache{
                 else if (write_cache){
                     if (write_cache_B){
                         for (int j = 0; j < cache_size; j++)
-                            acc_ramctrl.Data[j] = cache_B[j];
+                            acc_ramctrl.Data[j] = Funcs.FromFloat(cache_B[j]);
                 
                         acc_ramctrl.Enabled = true;
                         acc_ramctrl.Address = index_cache_B;
@@ -288,7 +289,7 @@ namespace Cache{
                     }
                     else if (write_cache_C){
                         for (int j = 0; j < cache_size; j++)
-                            acc_ramctrl.Data[j] = cache_C[j];
+                            acc_ramctrl.Data[j] = Funcs.FromFloat(cache_C[j]);
                 
                         acc_ramctrl.Enabled = true;
                         acc_ramctrl.Address = index_cache_C;
@@ -300,14 +301,14 @@ namespace Cache{
                     }else if (write_cache_A){
                         if(cache_A1_or_A2){
                             for (int j = 0; j < cache_size; j++)
-                                acc_ramctrl.Data[j] = cache_A2[j];
+                                acc_ramctrl.Data[j] = Funcs.FromFloat(cache_A2[j]);
                     
                             acc_ramctrl.Enabled = true;
                             acc_ramctrl.Address = index_cache_A2;
                             acc_ramctrl.IsWriting = true;
                         }else{
                             for (int j = 0; j < cache_size; j++)
-                                acc_ramctrl.Data[j] = cache_A1[j];
+                                acc_ramctrl.Data[j] = Funcs.FromFloat(cache_A1[j]);
                     
                             acc_ramctrl.Enabled = true;
                             acc_ramctrl.Address = index_cache_A1;
@@ -320,17 +321,17 @@ namespace Cache{
                     if(write_cache_B){
                         for (int j = 0; j < cache_size; j++){
                             if(copy_cache_A && !cache_A1_or_A2){
-                                cache_A1[j] = acc_ramresult.Data[j];
+                                cache_A1[j] = Funcs.FromUint(acc_ramresult.Data[j]);
                                 index_cache_A1 = received_data_address;
                                 if(received_data_address < number_of_blocks - 3)
                                     index_cache_B = received_data_address;
                             }else if (copy_cache_A && cache_A1_or_A2){
-                                cache_A2[j] = acc_ramresult.Data[j];
+                                cache_A2[j] = Funcs.FromUint(acc_ramresult.Data[j]);
                                 index_cache_A2 = received_data_address;
                                 if(received_data_address < number_of_blocks - 3)
                                     index_cache_B = received_data_address;
                             }else{
-                                cache_B[j] = acc_ramresult.Data[j];
+                                cache_B[j] = Funcs.FromUint(acc_ramresult.Data[j]);
                                 index_cache_B = received_data_address;
                             }
                         }
@@ -339,17 +340,17 @@ namespace Cache{
                     }else if(write_cache_C){
                         for (int j = 0; j < cache_size; j++){
                             if(copy_cache_A && !cache_A1_or_A2){
-                                cache_A1[j] = acc_ramresult.Data[j];
+                                cache_A1[j] = Funcs.FromUint(acc_ramresult.Data[j]);
                                 index_cache_A1 = received_data_address;
                                 if(received_data_address < number_of_blocks - 3)
                                     index_cache_C = received_data_address;
                             }else if (copy_cache_A && cache_A1_or_A2){
-                                cache_A2[j] = acc_ramresult.Data[j];
+                                cache_A2[j] = Funcs.FromUint(acc_ramresult.Data[j]);
                                 index_cache_A2 = received_data_address;
                                 if(received_data_address < number_of_blocks - 3)
                                     index_cache_C = received_data_address;
                             }else{
-                                cache_C[j] = acc_ramresult.Data[j];
+                                cache_C[j] = Funcs.FromUint(acc_ramresult.Data[j]);
                                 index_cache_C = received_data_address;
                             }
                         }
@@ -360,16 +361,16 @@ namespace Cache{
                             if(!cache_A1_or_A2){
                                 //  Written cache A1
                                 if(index_cache_B == index_cache_A2){
-                                    cache_B[j] = acc_ramresult.Data[j];
+                                    cache_B[j] = Funcs.FromUint(acc_ramresult.Data[j]);
                                 } else if(index_cache_C == index_cache_A2){
-                                    cache_C[j] = acc_ramresult.Data[j];
+                                    cache_C[j] = Funcs.FromUint(acc_ramresult.Data[j]);
                                 }
                             }else{
                                 // Written cache A2
                                 if(index_cache_B == index_cache_A1){
-                                    cache_B[j] = acc_ramresult.Data[j];
+                                    cache_B[j] = Funcs.FromUint(acc_ramresult.Data[j]);
                                 } else if(index_cache_C == index_cache_A1){
-                                    cache_C[j] = acc_ramresult.Data[j];
+                                    cache_C[j] = Funcs.FromUint(acc_ramresult.Data[j]);
                                 }
                             }
                         }
@@ -393,31 +394,31 @@ namespace Cache{
                 // Writing j to cache block
                 if(current_cache_index_j >= dirty_blocks){
                     if (current_cache_index_j == index_cache_A1){
-                        cache_A1[current_index_j] = - acceleration_input.val;
+                        cache_A1[current_index_j] = - Funcs.FromUint(acceleration_input.val);
                     }
                     else if(current_cache_index_j == index_cache_A2){
-                        cache_A2[current_index_j] = - acceleration_input.val;
+                        cache_A2[current_index_j] = - Funcs.FromUint(acceleration_input.val);
                     }
                     else if (current_cache_index_j == index_cache_B){
-                        cache_B[current_index_j] = - acceleration_input.val;
+                        cache_B[current_index_j] = - Funcs.FromUint(acceleration_input.val);
                     }
                     else if (current_cache_index_j == index_cache_C){
-                        cache_C[current_index_j] = - acceleration_input.val;
+                        cache_C[current_index_j] = - Funcs.FromUint(acceleration_input.val);
                     } 
                 }else{
                     // If A, B or C cache is dirty and have been written too
                     // it is necessary to accumulate the results.
                     if (current_cache_index_j == index_cache_A1){
-                        cache_A1[current_index_j] = cache_A1[current_index_j] - acceleration_input.val;
+                        cache_A1[current_index_j] = cache_A1[current_index_j] - Funcs.FromUint(acceleration_input.val);
                     }
                     else if (current_cache_index_j == index_cache_A2){
-                        cache_A2[current_index_j] = cache_A2[current_index_j] - acceleration_input.val;
+                        cache_A2[current_index_j] = cache_A2[current_index_j] - Funcs.FromUint(acceleration_input.val);
                     } 
                     else if (current_cache_index_j == index_cache_B){
-                        cache_B[current_index_j] = cache_B[current_index_j] - acceleration_input.val;
+                        cache_B[current_index_j] = cache_B[current_index_j] - Funcs.FromUint(acceleration_input.val);
                     }
                     else if (current_cache_index_j == index_cache_C){
-                        cache_C[current_index_j] = cache_C[current_index_j] - acceleration_input.val;
+                        cache_C[current_index_j] = cache_C[current_index_j] - Funcs.FromUint(acceleration_input.val);
                     }
                 }
                 // i will always write in a field that j have already written to
@@ -426,27 +427,27 @@ namespace Cache{
                 // Therefore at the initial clock cycle we simply write to the cache
                 // and thereafter we always accumulate the data 
                 if(initial_clock_cycle){
-                    cache_A1[current_index_i] = acceleration_input.val;
+                    cache_A1[current_index_i] = Funcs.FromUint(acceleration_input.val);
                     initial_clock_cycle = false;
                 } else if (last_cache_blocks){
                     if (current_cache_index_i == index_cache_A1){
-                        cache_A1[current_index_i] = cache_A1[current_index_i] + acceleration_input.val;;
+                        cache_A1[current_index_i] = cache_A1[current_index_i] + Funcs.FromUint(acceleration_input.val);
                     }
                     else if (current_cache_index_i == index_cache_A2){
-                        cache_A2[current_index_i] = cache_A2[current_index_i] + acceleration_input.val;;
+                        cache_A2[current_index_i] = cache_A2[current_index_i] + Funcs.FromUint(acceleration_input.val);
                     } 
                     else if (current_cache_index_i == index_cache_B){
-                        cache_B[current_index_i] = cache_B[current_index_i] + acceleration_input.val;;
+                        cache_B[current_index_i] = cache_B[current_index_i] + Funcs.FromUint(acceleration_input.val);
                     }
                     else if (current_cache_index_i == index_cache_C){
-                        cache_C[current_index_i] = cache_C[current_index_i] + acceleration_input.val;;
+                        cache_C[current_index_i] = cache_C[current_index_i] + Funcs.FromUint(acceleration_input.val);
                     }
                 }
                 else{
                     if(cache_A1_or_A2){
-                        cache_A1[current_index_i] = cache_A1[current_index_i] + acceleration_input.val;
+                        cache_A1[current_index_i] = cache_A1[current_index_i] + Funcs.FromUint(acceleration_input.val);
                     }else{
-                        cache_A2[current_index_i] = cache_A2[current_index_i] + acceleration_input.val;;
+                        cache_A2[current_index_i] = cache_A2[current_index_i] + Funcs.FromUint(acceleration_input.val);
                     }
                 }
             }
@@ -463,7 +464,7 @@ namespace Cache{
                     output.valid = true;
                     if (write_cache_B){
                         for (int j = 0; j < cache_size; j++)
-                            acc_ramctrl.Data[j] = cache_B[j];
+                            acc_ramctrl.Data[j] = Funcs.FromFloat(cache_B[j]);
                 
                         acc_ramctrl.Enabled = true;
                         acc_ramctrl.Address = index_cache_B;
@@ -471,7 +472,7 @@ namespace Cache{
                     }
                     else if (write_cache_C){
                         for (int j = 0; j < cache_size; j++)
-                            acc_ramctrl.Data[j] = cache_C[j];
+                            acc_ramctrl.Data[j] = Funcs.FromFloat(cache_C[j]);
                 
                         acc_ramctrl.Enabled = true;
                         acc_ramctrl.Address = index_cache_C;
@@ -480,7 +481,7 @@ namespace Cache{
                     }
                     else if (write_cache_A && cache_A1_or_A2){
                         for (int j = 0; j < cache_size; j++)
-                            acc_ramctrl.Data[j] = cache_A1[j];
+                            acc_ramctrl.Data[j] = Funcs.FromFloat(cache_A1[j]);
                 
                         acc_ramctrl.Enabled = true;
                         acc_ramctrl.Address = index_cache_A1;
@@ -488,7 +489,7 @@ namespace Cache{
                     }
                     else if (write_cache_A && !cache_A1_or_A2){
                         for (int j = 0; j < cache_size; j++)
-                            acc_ramctrl.Data[j] = cache_A2[j];
+                            acc_ramctrl.Data[j] = Funcs.FromFloat(cache_A2[j]);
                 
                         acc_ramctrl.Enabled = true;
                         acc_ramctrl.Address = index_cache_A2;
@@ -507,34 +508,34 @@ namespace Cache{
     [ClockedProcess]
     public class AccelerationDataRam : SimpleProcess
     {
-        public AccelerationDataRam(int size)
+        public AccelerationDataRam(uint size)
         {
             mem_size = size;
-            mem = new int[size];
-            arr_size = ControlA.Data.Length;
+            mem = new uint[size];
+            arr_size = (uint)ControlA.Data.Length;
         }
 
         [InputBus]
         public RamCtrlArray ControlA = Scope.CreateBus<RamCtrlArray>();
 
         [InputBus]
-        public RamCtrlInt ControlB = Scope.CreateBus<RamCtrlInt>(); 
+        public RamCtrlUint ControlB = Scope.CreateBus<RamCtrlUint>(); 
 
         [OutputBus]
         public RamResultArray ReadResultA = 
             Scope.CreateBus<RamResultArray>();
 
         [OutputBus]
-        public RamResultInt ReadResultB = Scope.CreateBus<RamResultInt>();
+        public RamResultUint ReadResultB = Scope.CreateBus<RamResultUint>();
        
-        int mem_size;
-        int arr_size;
-        int[] mem;
+        uint mem_size;
+        uint arr_size;
+        uint[] mem;
 
         protected override void OnTick()
         { 
             if (ControlB.Enabled)
-                ReadResultB.Data = ControlB.Address < mem_size ? mem[ControlB.Address]: -1;
+                ReadResultB.Data = ControlB.Address < mem_size ? mem[ControlB.Address]: (uint)0xFFFFFFFF;
             
             if (ControlA.Enabled)
                 for (int i = 0; i < arr_size; i++)
@@ -542,7 +543,7 @@ namespace Cache{
                         ReadResultA.Data[i] = mem[ControlA.Address*arr_size + i];
                     }else{
                         // Data outside of memory
-                        ReadResultA.Data[i] = -1;
+                        ReadResultA.Data[i] = (uint)0xFFFFFFFF;
                     }
                 
 

@@ -1,6 +1,6 @@
 using SME;
 using System;
-using System.Collections.Generic;
+using Deflib;
 
 namespace Cache{
 
@@ -11,10 +11,10 @@ namespace Cache{
         public FlagBus acceleration_result;
     
         [InputBus]
-        public RamResultInt acc_ramresult;
+        public RamResultUint acc_ramresult;
         
         [OutputBus]
-        public RamCtrlInt acc_ramctrl;
+        public RamCtrlUint acc_ramctrl;
         
         [OutputBus]
         public ValBus acceleration_ready = Scope.CreateBus<ValBus>();
@@ -24,27 +24,27 @@ namespace Cache{
 
         
 
-        public Testing_Simulator(int[] positions, int cache_size)
+        public Testing_Simulator(uint[] positions, uint cache_size)
         {
             this.positions = positions;
             this.size = cache_size;
         }
 
-        private int[] positions;
-        private int size;
+        private uint[] positions;
+        private uint size;
 
         public override async System.Threading.Tasks.Task Run() 
         {
             // Initial await
             await ClockAsync();
             bool running = true;
-            acceleration_ready.val = positions.Length;
+            acceleration_ready.val = (uint)positions.Length;
             acceleration_ready.valid = true;
             await ClockAsync();
             acceleration_ready.valid = false;
 
-            int count = 1;
-            int[] test_accelerations = new int[positions.Length];
+            float count = 1.0f;
+            float[] test_accelerations = new float[positions.Length];
             for(int k = 0; k < positions.Length; k++){
                 for(int n = k + 1; n < positions.Length; n++){
                     test_accelerations[k] += count;
@@ -52,17 +52,17 @@ namespace Cache{
                     count++;
                 }
             }
-            int input = 1;
-            int i = 0;
-            int j = 0;
+            float input = 1.0f;
+            uint i = 0;
+            uint j = 0;
             int data_size = positions.Length;
             // int size = 0;
-            int ready_to_read = 0;
+            uint ready_to_read = 0;
 
             while(running){
 
                 if(input < count){
-                    acceleration_input.val = input;
+                    acceleration_input.val = Funcs.FromFloat(input);
                     acceleration_input.valid = true;
                     input++;
                 }else{
@@ -77,7 +77,7 @@ namespace Cache{
                 }
 
                 if(i-j >= 2 || i >= positions.Length){
-                    int input_result = acc_ramresult.Data;
+                    float input_result = Funcs.FromUint(acc_ramresult.Data);
                     if(test_accelerations[j] != input_result)
                         Console.WriteLine("Acceleration result - Got {0}, expected {1} at {2}",
                                 input_result, test_accelerations[j], j);

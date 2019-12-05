@@ -9,6 +9,7 @@
     <ProjectReference Include="/home/albt/git/sme/src/SME/SME.csproj" />
     <ProjectReference Include="/home/albt/git/sme/src/SME.Tracer/SME.Tracer.csproj" />
     <ProjectReference Include="/home/albt/git/sme/src/SME.VHDL/SME.VHDL.csproj" />
+    <ProjectReference Include="../Deflib/Deflib.csproj"/>
   </ItemGroup>
 
 </Project>
