@@ -6,6 +6,33 @@ namespace Deflib {
 
     ////// CALCULATIONS //////
 
+    
+    // Absolute process with floating point
+    // Input: An input (negative or positive) (uint)
+    // Output: The absolute value of the input (uint)
+    [ClockedProcess]
+    public class Abs : SimpleProcess 
+    {
+        [InputBus]
+        public ValBus input;
+
+        [OutputBus]
+        public ValBus output = Scope.CreateBus<ValBus>();
+
+        protected override void OnTick()
+        {
+            if(input.valid){
+                float float_input = Funcs.FromUint(input.val);
+                float float_output = (float) Math.Abs(float_input);
+                output.val = Funcs.FromFloat(float_output);
+                output.valid = true;
+            } else {
+                output.valid = false;
+            }
+        }
+    }
+
+
 
     // Minus process with floating point
     // Input: A minuend and a subtrahend (uint)
@@ -121,6 +148,7 @@ namespace Deflib {
     }
 
 
+    // TODO: Handle div by 0!!
 
     // Division process with floating point
     // Input: A divident and a divisor (uint)
