@@ -1,5 +1,6 @@
 using System;
 using SME;
+using SME.Components;
 using Deflib;
 
 namespace Acceleration
@@ -10,39 +11,47 @@ namespace Acceleration
 
         static void Main(string[] args)
         {
-            using(var sim = new Simulation()){
-                // uint[] positions = new uint[data_size];
-                // for(int k = 0; k < data_size; k++){
-                //     positions[k] = (uint)k+1;
-                // }
+            for(int i = 0; i < 100; i++){
+                using(var sim = new Simulation()){
 
-                // //External simulation process
-                // var testing_simulator = new Testing_Simulator(positions, (uint)Cache_size.n);
+                    uint data_size = 80;
+                    
+                    
+                    // RAM
+                    var position_ram1 = new TrueDualPortMemory<uint>((int)data_size);
+                    var position_ram2 = new TrueDualPortMemory<uint>((int)data_size);
+                    
+                    var manager = new Manager();
 
-                // // RAM
-                // var acceleration_ram = new AccelerationDataRam((uint)positions.Length);
-                
+                    var testing_simulator = new Testing_Simulation(data_size);
+                    Acceleration acceleration = new Acceleration(manager.pos1_output, manager.pos2_output);
+                    
 
-                // var acceleration_cache = new AccelerationCache((uint)Cache_size.n);
-                
-                
-                // acceleration_cache.acceleration_input = testing_simulator.acceleration_input;
-                // acceleration_cache.ready = testing_simulator.acceleration_ready;
-                // acceleration_cache.acc_ramctrl = acceleration_ram.ControlA;
-                // acceleration_cache.acc_ramresult = acceleration_ram.ReadResultA;
-                
-                // testing_simulator.acc_ramctrl = acceleration_ram.ControlB;
-                // testing_simulator.acc_ramresult = acceleration_ram.ReadResultB;
-                // testing_simulator.acceleration_result = acceleration_cache.output;
 
-                // sim
-                // // .AddTopLevelInputs(acceleration_cache.acceleration_input, acceleration_cache.ready, testing_simulator.acc_ramctrl)
-                // // .AddTopLevelOutputs(testing_simulator.acc_ramresult, acceleration_cache.output)
-                // // .BuildCSVFile()
-                // // .BuildVHDL()
-                // .Run()
-                // ;
+                    manager.input = testing_simulator.output;
+                    manager.pos1_ramctrl = position_ram1.ControlA;
+                    manager.pos2_ramctrl = position_ram2.ControlA;
+                    manager.pos1_ramresult = position_ram1.ReadResultA;
+                    manager.pos2_ramresult = position_ram2.ReadResultA;
+
+                    testing_simulator.input = acceleration.output;
+                    testing_simulator.pos1_ramctrl = position_ram1.ControlB;
+                    testing_simulator.pos2_ramctrl = position_ram2.ControlB;
+
+                    testing_simulator.input = acceleration.output;
+                    
+                    
+                    sim
+                    // // .AddTopLevelInputs(acceleration_cache.acceleration_input, acceleration_cache.ready, testing_simulator.acc_ramctrl)
+                    // // .AddTopLevelOutputs(testing_simulator.acc_ramresult, acceleration_cache.output)
+                    // // .BuildCSVFile()
+                    // // .BuildVHDL()
+                    .Run()
+                    ;
+                }
+                Console.WriteLine("Simulation number {0}", i);
             }
+            
         }
     }
 
@@ -125,6 +134,7 @@ namespace Acceleration
 
             // Calculation processes
             var div         = new Div();
+            var abs         = new Abs();
             var ln          = new Ln();
             var mul12       = new Mul();
             var mul6        = new Mul();
@@ -142,7 +152,8 @@ namespace Acceleration
             /* NOTE: e^{x*ln*b} == b^x*/
             div.divisor                         = input;
             div.divident                        = const_sigma.output;
-            ln.input                            = div.quotient;
+            abs.input                           = div.quotient;
+            ln.input                            = abs.output;
             mul12.multiplicant                  = ln.output;
             mul12.multiplier                    = const_twelve.output;
             mul6.multiplicant                   = ln.output;

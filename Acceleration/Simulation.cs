@@ -1,9 +1,103 @@
 using System;
 using System.Collections.Generic;
 using SME;
+using SME.Components;
 using Deflib;
 
+using System.Linq;
+
 namespace Acceleration{
+
+
+    public class Testing_Simulation : SimulationProcess
+    {
+        [InputBus]
+        public ValBus input;
+
+        [OutputBus]
+        public TrueDualPortMemory<uint>.IControlB pos1_ramctrl;
+        [OutputBus]
+        public TrueDualPortMemory<uint>.IControlB pos2_ramctrl;
+
+        [OutputBus]
+        public ValBus output = Scope.CreateBus<ValBus>();
+
+        public Testing_Simulation(uint data_size){
+            this.data_size = data_size;
+        }
+
+        private uint data_size;
+
+        public override async System.Threading.Tasks.Task Run()
+        {
+            await ClockAsync();
+
+            Random rnd = new Random();
+            // Testing data
+            // Positions array is kept float so that the uint bitstream can be
+            // generated correctly
+            float[] positions = new float[data_size];
+            for(uint k = 0; k < data_size; k++){
+                int random_number = rnd.Next(10,1000);
+                float float_rnd_number = random_number;
+                if(!positions.Contains((float) random_number))
+                    positions[k] = (float) random_number;
+                else
+                    k--;
+            }
+            
+            for(int k = 0; k < positions.Length; k++){
+                pos1_ramctrl.Enabled = true;
+                pos1_ramctrl.Address = k;
+                pos1_ramctrl.Data = Funcs.FromFloat(positions[k]);
+                pos1_ramctrl.IsWriting = true;
+
+                pos2_ramctrl.Enabled = true;
+                pos2_ramctrl.Address = k;
+                pos2_ramctrl.Data = Funcs.FromFloat(positions[k]);
+                pos2_ramctrl.IsWriting = true;
+                await ClockAsync();
+            }
+            bool running = true;
+            pos1_ramctrl.Enabled = false;
+            pos2_ramctrl.Enabled = false;
+            output.val = (uint)positions.Length;
+            output.valid = true;
+            await ClockAsync();
+            output.valid = false;
+
+            int i = 0;
+            int j = 1;
+            Queue<float> calculated_result_queue = new Queue<float>();
+            while(running){
+                if(input.valid){
+                    float calculated_result = Sim_Funcs.Acceleration_Calc(positions[i], positions[j]);
+                    calculated_result_queue.Enqueue(calculated_result);
+
+                    if(i <= data_size -2 && j <= data_size -1){
+                        float calc_result = calculated_result_queue.Dequeue();
+                        float input_result = Funcs.FromUint(input.val);
+
+                        if(input_result != calc_result){
+                            // Console.WriteLine("pos1 {0}: {1}, pos2 {2}: {3}", i, positions[i], j, positions[j]);
+                            Console.WriteLine("Acceleration test sim - Got {0}, Expected {0}", input_result, calc_result);
+                        }
+                        if(i >= data_size - 2){
+                            running = false;
+                            Console.WriteLine("Acceleration test successfully completed");
+                        }
+                        if(j >= data_size -1 ){
+                            i++;
+                            j = i + 1;
+                        }else{
+                            j++;
+                        }
+                    }
+                }
+                await ClockAsync();
+            }
+        }
+    }
 
 
     // FORCE SIMULATIONS
@@ -62,6 +156,7 @@ namespace Acceleration{
                         await ClockAsync();    
                 }
                 float float_r = Funcs.FromUint(input_r.val);
+            
                  // Force test results
                 float force_result = Sim_Funcs.Force_Calc(float_r);
                 input_queue.Enqueue(force_result);
@@ -69,7 +164,7 @@ namespace Acceleration{
                     float float_val = Funcs.FromUint(input_result.val);
                     float calc_result = input_queue.Dequeue();
                     if(float_val != calc_result) {
-                        Console.WriteLine("Force sim: Got {0}, expected {1}", float_val, calc_result);
+                        Console.WriteLine("Internal force sim: Got {0}, expected {1}", float_val, calc_result);
                     }
                 }
                 await ClockAsync();
@@ -155,7 +250,7 @@ namespace Acceleration{
                     float result = Funcs.FromUint(input_result.val);
                     float calc_result = input_queue.Dequeue();
                     if (calc_result != result){
-                        Console.WriteLine("Acceleration sim: Got {0}, expected {1}", result, calc_result);
+                        Console.WriteLine("Internal Acceleration sim: Got {0}, expected {1}", result, calc_result);
                     }
                 }
                 await ClockAsync();
@@ -180,17 +275,18 @@ namespace Acceleration{
 
         public static float Force_Calc(float r)
         {
-            float div = SIGMA / r;
-            float ln = (float) Math.Log(div);
-            float mul12 = ln * 12;
-            float mul6 = ln * 6;
-            float exp12 = (float) Math.Exp(mul12);
-            float exp6 = (float) Math.Exp(mul6);
-            float min = exp12 - exp6;
-            float fourepsilon = 4 * EPSILON;
+            // float div = SIGMA / r;
+            // float abs = (float) Math.Abs(div);
+            // float ln = (float) Math.Log(abs);
+            // float mul12 = ln * 12;
+            // float mul6 = ln * 6;
+            // float exp12 = (float) Math.Exp(mul12);
+            // float exp6 = (float) Math.Exp(mul6);
+            // float min = exp12 - exp6;
+            // float fourepsilon = 4 * EPSILON;
             float force_result = 4 * EPSILON 
-                                 * (((float) Math.Exp(((float)Math.Log(SIGMA  / r)) 
-                                 * 12)) - ((float) Math.Exp(((float)Math.Log(SIGMA  / r)) * 6)));
+                                 * (((float) Math.Exp(((float)Math.Log(Math.Abs(SIGMA  / r))) 
+                                 * 12)) - ((float) Math.Exp(((float)Math.Log(Math.Abs(SIGMA  / r))) * 6)));
             return force_result;
         }
     }
