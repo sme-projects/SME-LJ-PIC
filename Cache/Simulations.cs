@@ -84,6 +84,8 @@ namespace Cache{
                     j++;
                 }
 
+                // TODO: Why does this structure has to be different than
+                // velocity simulation?
                 if(i < ready_to_read){
                     acc_ramctrl.Address = i;
                     i++;

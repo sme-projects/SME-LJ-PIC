@@ -32,12 +32,42 @@ namespace Deflib {
         }
     }
 
+    // Add process with floating point
+    // Input: A Augend and a Addend (uint)
+    // Output: A sum (uint)
+    // Augend + Addend = Sum
+    [ClockedProcess]
+    public class Add : SimpleProcess 
+    {
+        [InputBus]
+        public ValBus augend;
+
+        [InputBus]
+        public ValBus addend;
+
+
+        [OutputBus]
+        public ValBus sum = Scope.CreateBus<ValBus>();
+
+        protected override void OnTick()
+        {
+            if(augend.valid && addend.valid ){
+                float float_augend = Funcs.FromUint(augend.val);
+                float float_addend = Funcs.FromUint(addend.val);
+                float float_sum = float_augend + float_addend;
+                sum.val = Funcs.FromFloat(float_sum);
+                sum.valid = true;
+            } else {
+                sum.valid = false;
+            }
+        }
+    }
 
 
     // Minus process with floating point
     // Input: A minuend and a subtrahend (uint)
     // Output: A difference (uint)
-    // Minuend - subtrahend = difference
+    // minuend - subtrahend = difference
     [ClockedProcess]
     public class Min : SimpleProcess 
     {
@@ -180,32 +210,6 @@ namespace Deflib {
         }
     }
 
-    // Square root process with floating point
-    // Input: An input (uint)
-    // Output: An output (uint)
-    // sqrt(input) = output
-    // [ClockedProcess]
-    // public class Sqrt : SimpleProcess 
-    // {
-    //     [InputBus]
-    //     public ValBus input;
-
-    //     [OutputBus]
-    //     public ValBus output = Scope.CreateBus<ValBus>();
-
-    //     protected override void OnTick()
-    //     {
-    //         if(input.valid){
-    //             float float_input = Funcs.FromUint(input.val);
-    //             float float_output = (float) Math.Sqrt(float_input);
-    //             output.val = Funcs.FromFloat(float_output);
-    //             output.valid = true;
-    //         } else {
-    //             output.valid = false;
-    //         }
-    //     }
-    // }
-
 
     [ClockedProcess]
     public class Constants : SimpleProcess
@@ -229,43 +233,65 @@ namespace Deflib {
     }
 
 
+    // MISCELLANEOUS PROCESS
+
+    [ClockedProcess]
+    public class Pipelineregister : SimpleProcess
+    {
+
+        [InputBus]
+        public ValBus input;
+
+        [OutputBus]
+        public ValBus output = Scope.CreateBus<ValBus>();
+
+        protected override void OnTick()
+        {
+            if(input.valid){
+                output.valid = true;
+                output.val = input.val;
+            }
+        }
+    }
+
+    // A multiplexer which should be a clocked process 
+    public class Multiplexer : SimpleProcess
+    {
+        [InputBus]
+        public TrueDualPortMemory<uint>.IControlB first_input = Scope.CreateBus<TrueDualPortMemory<uint>.IControlB>();
+        
+        [InputBus]
+        public TrueDualPortMemory<uint>.IControlB second_input = Scope.CreateBus<TrueDualPortMemory<uint>.IControlB>();
+
+        [OutputBus]
+        public TrueDualPortMemory<uint>.IControlB output;
+
+
+        protected override void OnTick()
+        {
+            if(first_input.Enabled){
+                output.Enabled = true;
+                output.Data = first_input.Data;
+                output.Address = first_input.Address;
+                output.IsWriting = first_input.IsWriting;
+            }else if(second_input.Enabled){
+                output.Enabled = true;
+                output.Data = second_input.Data;
+                output.Address = second_input.Address;
+                output.IsWriting = second_input.IsWriting;
+            }else{
+                output.Enabled = false;
+                output.Data = 0;
+                output.Address = 0;
+                output.IsWriting = false;
+            }
+        }
+    }
+
+
 
     ////// RAM PROCESS //////
 
-    [ClockedProcess]
-    public class Ram : SimpleProcess
-    {
-        [InputBus]
-        public TrueDualPortMemory<uint>.IControlA ControlA = Scope.CreateBus<TrueDualPortMemory<uint>.IControlA>();
-        [InputBus]
-        public TrueDualPortMemory<uint>.IControlB ControlB = Scope.CreateBus<TrueDualPortMemory<uint>.IControlB>();
-        [OutputBus]
-        public TrueDualPortMemory<uint>.IReadResultA ReadResultA = Scope.CreateBus<TrueDualPortMemory<uint>.IReadResultA>();
-        [OutputBus]
-        public TrueDualPortMemory<uint>.IReadResultB ReadResultB = Scope.CreateBus<TrueDualPortMemory<uint>.IReadResultB>();
-
-        uint[] mem;
-
-        public Ram(uint size){
-            mem = new uint[size];
-        }
-
-        protected override void OnTick(){
-            if(ControlA.Enabled) {
-                ReadResultA.Data = mem[ControlA.Address];
-                if(ControlA.IsWriting) {
-                    mem[ControlA.Address] = ControlA.Data;
-                }
-            }
-            if(ControlB.Enabled) {
-                ReadResultB.Data = mem[ControlB.Address];
-                if(ControlB.IsWriting) {
-                    mem[ControlB.Address] = ControlB.Data;
-                }
-            }
-            
-        }
-    }
 
     [ClockedProcess]
     public class AccelerationDataRam : SimpleProcess
