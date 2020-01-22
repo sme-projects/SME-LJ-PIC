@@ -21,9 +21,11 @@ namespace Acceleration
                     var position_ram1 = new TrueDualPortMemory<uint>((int)data_size);
                     var position_ram2 = new TrueDualPortMemory<uint>((int)data_size);
                     
+                    // TODO: Give the data_size to manager as an argument
                     var manager = new Manager();
 
                     var testing_simulator = new Testing_Simulation(data_size);
+                    // TODO: Make the manager handle the result from acceleration and sent to test/cache 
                     Acceleration acceleration = new Acceleration(manager.pos1_output, manager.pos2_output);
                     
 

@@ -8,9 +8,9 @@ namespace Deflib{
         static float SIGMA = 3.4f;
         static float EPSILON = 0.0103f;
 
-        public static float Velocity_Calc(float prev_velocity, float acceleration, float timestep)
+        public static float Update_Data_Calc(float prev_data_point, float external_data_point, float timestep)
         {
-            float result = prev_velocity + (acceleration * timestep);
+            float result = prev_data_point + (external_data_point * timestep);
             return result;
         }
 
