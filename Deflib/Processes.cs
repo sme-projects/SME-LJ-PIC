@@ -236,7 +236,7 @@ namespace Deflib {
     // MISCELLANEOUS PROCESS
 
     [ClockedProcess]
-    public class Pipelineregister : SimpleProcess
+    public class PipelineRegister : SimpleProcess
     {
 
         [InputBus]
@@ -251,6 +251,23 @@ namespace Deflib {
                 output.valid = true;
                 output.val = input.val;
             }
+        }
+    }
+
+    public class nPipe
+    {
+        public PipelineRegister first;
+        public PipelineRegister last;
+
+        public nPipe(int n)
+        {
+            PipelineRegister[] regs = new PipelineRegister[n];
+            for (int i = 0; i < n; i++)
+                regs[i] = new PipelineRegister();
+            for (int i = 1; i < n; i++)
+                regs[i].input = regs[i-1].output;
+            first = regs[0];
+            last = regs[regs.Length-1];
         }
     }
 

@@ -11,10 +11,10 @@ namespace Acceleration
 
         static void Main(string[] args)
         {
-            for(int i = 0; i < 100; i++){
+            for(int i = 0; i < 1; i++){
                 using(var sim = new Simulation()){
 
-                    uint data_size = 80;
+                    uint data_size = 10;
                     
                     
                     // RAM
@@ -79,25 +79,30 @@ namespace Acceleration
             // Constant processes
             var const_mass_of_argon = new Constants(MASS_OF_ARGON);
 
-            //Internal simulation process
+            // Internal simulation process
             var internal_acceleration_sim = 
                 new Internal_Acceleration_Sim(MASS_OF_ARGON, SIGMA, EPSILON);
             internal_acceleration_sim.input_pos1 = input_pos1;
             internal_acceleration_sim.input_pos2 = input_pos2;
 
             // Calculation processes
-             var min         = new Min();
-            // Adding sqrt and mul maybe? 
+            var min             = new Min();
+            // TODO: Add calculations for more dimensions 
             Force force = new Force(min.difference);
-            //var mul        = new Mul();
-            //var div        = new Div();
-            var div_mass       = new Div();
+
+            // Piping min.difference through force
+            var npipe = new nPipe(force.depth);
+
+            var mul             = new Mul();
+            var div_mass        = new Div();
 
 
             min.minuend                             = input_pos2;
             min.subtrahend                          = input_pos1;
-
-            div_mass.divident                       = force.output;
+            npipe.first.input                       = min.difference;
+            mul.multiplicant                        = force.output;
+            mul.multiplier                          = npipe.last.output;
+            div_mass.divident                       = mul.product;
             div_mass.divisor                        = const_mass_of_argon.output;
             output                                  = div_mass.quotient;
             internal_acceleration_sim.input_result  = div_mass.quotient;
@@ -114,6 +119,8 @@ namespace Acceleration
         public ValBus input;
         public ValBus output;
 
+        public int depth = 8;
+
         public Force(ValBus input)
         {   
             this.input = input;
@@ -124,6 +131,10 @@ namespace Acceleration
             float EPSILON = 0.0103f;
             float TWELVE = 12.0f;
             float SIX = 6.0f;
+            float FOURTEEN = 14.0f;
+            float EIGHT = 8.0f;
+            float FOURTYEIGHT = 48.0f;
+            float TWENTYFOUR = 24.0f;
             float FOUR = 4.0f;
             
 
@@ -132,44 +143,83 @@ namespace Acceleration
             var const_epsilon = new Constants(EPSILON);
             var const_twelve = new Constants(TWELVE);
             var const_six = new Constants(SIX);
+            var const_fourteen = new Constants(FOURTEEN);
+            var const_eight = new Constants(EIGHT);
+            var const_fourtyeight = new Constants(FOURTYEIGHT);
+            var const_twentyfour = new Constants(TWENTYFOUR);
             var const_four = new Constants(FOUR);
 
             // Calculation processes
-            var div         = new Div();
-            var abs         = new Abs();
-            var ln          = new Ln();
-            var mul12       = new Mul();
-            var mul6        = new Mul();
-            var exp12       = new Exp();
-            var exp6        = new Exp();
-            var minus       = new Min();
-            var mulepsilon  = new Mul();
-            var mul4        = new Mul();
+            // (48*eps*(sig^12/r^14)) - (24*eps*(sig^6/r^8))
+            var abs_sigma       = new Abs();
+            var ln_sigma        = new Ln();
+            var abs_r           = new Abs();
+            var ln_r            = new Ln();
+            var mul12           = new Mul();
+            var mul6            = new Mul();
+            var mul14           = new Mul();
+            var mul8            = new Mul();
+            var exp12           = new Exp();
+            var exp6            = new Exp();
+            var exp14           = new Exp();
+            var exp8            = new Exp();
+            var div_12_14       = new Div();
+            var div_6_8         = new Div();
+            var mul_eps_12_14   = new Mul();
+            var mul_eps_6_8     = new Mul();
+            var mul_48          = new Mul();
+            var mul_24          = new Mul();
+            var minus           = new Min();
+            
 
             //Internal simulation process
             var internal_force_simulation = new Internal_Force_Sim(SIGMA, EPSILON);
 
             internal_force_simulation.input_r = input;
             
-            /* NOTE: e^{x*ln*b} == b^x*/
-            div.divisor                         = input;
-            div.divident                        = const_sigma.output;
-            abs.input                           = div.quotient;
-            ln.input                            = abs.output;
-            mul12.multiplicant                  = ln.output;
-            mul12.multiplier                    = const_twelve.output;
-            mul6.multiplicant                   = ln.output;
-            mul6.multiplier                     = const_six.output;
-            exp12.input                         = mul12.product;
-            exp6.input                          = mul6.product;
-            minus.minuend                       = exp12.output;
-            minus.subtrahend                    = exp6.output;
-            mulepsilon.multiplicant             = const_epsilon.output;
-            mulepsilon.multiplier               = minus.difference;
-            mul4.multiplicant                   = const_four.output;
-            mul4.multiplier                     = mulepsilon.product;
-            output                              = mul4.product;
-            internal_force_simulation.input_result     = mul4.product;
+            /* NOTE: e^{x*ln(b)} == b^x*/
+            abs_r.input                             = input;
+            abs_sigma.input                         = const_sigma.output;
+            ln_r.input                              = abs_r.output;
+            ln_sigma.input                          = abs_sigma.output;
+            
+            mul12.multiplicant                      = const_twelve.output;
+            mul12.multiplier                        = ln_sigma.output;
+            mul6.multiplicant                       = const_six.output;
+            mul6.multiplier                         = ln_sigma.output;
+            exp12.input                             = mul12.product;
+            exp6.input                              = mul6.product;
+
+            mul14.multiplicant                      = const_fourteen.output;
+            mul14.multiplier                        = ln_r.output;
+            mul8.multiplicant                       = const_eight.output;
+            mul8.multiplier                         = ln_r.output;
+            exp14.input                             = mul14.product;
+            exp8.input                              = mul8.product;
+
+            div_12_14.divident                      = exp12.output;
+            div_12_14.divisor                       = exp14.output;
+
+            div_6_8.divident                        = exp6.output;
+            div_6_8.divisor                         = exp8.output;
+
+            mul_eps_12_14.multiplicant              = const_epsilon.output;
+            mul_eps_12_14.multiplier                = div_12_14.quotient;
+
+            mul_eps_6_8.multiplicant                = const_epsilon.output;
+            mul_eps_6_8.multiplier                  = div_6_8.quotient;
+
+            mul_48.multiplicant                     = const_fourtyeight.output;
+            mul_48.multiplier                       = mul_eps_12_14.product;
+
+            mul_24.multiplicant                     = const_twentyfour.output;
+            mul_24.multiplier                       = mul_eps_6_8.product;
+
+            minus.minuend                           = mul_48.product;
+            minus.subtrahend                        = mul_24.product;
+
+            output                                  = minus.difference;
+            internal_force_simulation.input_result  = minus.difference;
 
         }
     }

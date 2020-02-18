@@ -44,6 +44,8 @@ namespace Acceleration{
                     positions[k] = (float) random_number;
                 else
                     k--;
+                // Non-random data:
+                // positions[k] = (float) k + 1;
             }
             
             for(int k = 0; k < positions.Length; k++){
@@ -70,17 +72,20 @@ namespace Acceleration{
             int j = 1;
             Queue<float> calculated_result_queue = new Queue<float>();
             while(running){
+
                 if(input.valid){
+                    // TODO: Rename the control result to something with "control result"
                     float calculated_result = Sim_Funcs.Acceleration_Calc(positions[i], positions[j]);
                     calculated_result_queue.Enqueue(calculated_result);
-
                     if(i <= data_size -2 && j <= data_size -1){
                         float calc_result = calculated_result_queue.Dequeue();
                         float input_result = Funcs.FromUint(input.val);
 
-                        if(input_result != calc_result){
-                            // Console.WriteLine("pos1 {0}: {1}, pos2 {2}: {3}", i, positions[i], j, positions[j]);
+                        // TODO: Figure out what the expected and accepted difference can be
+                        if(Math.Abs(calc_result - input_result) > 1/(Math.Pow(10,7))){
+                            Console.WriteLine("pos1 {0}: {1}, pos2 {2}: {3}", i, positions[i], j, positions[j]);
                             Console.WriteLine("Acceleration test sim - Got {0}, Expected {0}", input_result, calc_result);
+                            // Console.WriteLine($"Acc difference : Got {Math.Abs(calc_result - input_result)}");
                         }
                         if(i >= data_size - 2){
                             running = false;
@@ -158,13 +163,16 @@ namespace Acceleration{
                 float float_r = Funcs.FromUint(input_r.val);
             
                  // Force test results
+                 // TODO: Rename the control result to something with "control result"
                 float force_result = Sim_Funcs.Force_Calc(float_r);
                 input_queue.Enqueue(force_result);
                 if(input_result.valid){
                     float float_val = Funcs.FromUint(input_result.val);
                     float calc_result = input_queue.Dequeue();
-                    if(float_val != calc_result) {
+                    // TODO: Figure out what the expected and accepted difference can be
+                    if(Math.Abs(calc_result - float_val) > 1/(Math.Pow(10,7))) {
                         Console.WriteLine("Internal force sim: Got {0}, expected {1}", float_val, calc_result);
+                        Console.WriteLine($"Internal force diff : Got {Math.Abs(calc_result - float_val)}");
                     }
                 }
                 await ClockAsync();
@@ -244,13 +252,16 @@ namespace Acceleration{
                 float pos1 = Funcs.FromUint(input_pos1.val);
                 float pos2 = Funcs.FromUint(input_pos2.val);
                 //Acceleration test results
+                // TODO: Rename the control result to something with "control result"
                 float acceleration_result = Sim_Funcs.Acceleration_Calc(pos1, pos2);
                 input_queue.Enqueue(acceleration_result);
                 if(input_result.valid){
                     float result = Funcs.FromUint(input_result.val);
                     float calc_result = input_queue.Dequeue();
-                    if (calc_result != result){
+                    // TODO: Figure out what the expected and accepted difference can be
+                    if (Math.Abs(calc_result - result) > 1/(Math.Pow(10,7))){
                         Console.WriteLine("Internal Acceleration sim: Got {0}, expected {1}", result, calc_result);
+                        Console.WriteLine($"Internal Acc diff: Got {Math.Abs(calc_result - result)}");
                     }
                 }
                 await ClockAsync();
