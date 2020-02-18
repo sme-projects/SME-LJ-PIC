@@ -147,46 +147,4 @@ namespace Data_Update{
         }
     }
 
-    public class Internal_Simulation : SimulationProcess 
-    {
-        [InputBus]
-        public ValBus prev_data_point;
-        [InputBus]
-        public ValBus external_data_point;
-        [InputBus]
-        public ValBus input_result;
-
-        public Internal_Simulation(float timestep)
-        {
-            this.timestep = timestep;
-        }
-
-        private float timestep;
-
-        public override async System.Threading.Tasks.Task Run()
-        {
-            Queue<float> input_queue = new Queue<float>();
-            while(true){
-                while(!prev_data_point.valid && !external_data_point.valid) {
-                        await ClockAsync();    
-                }
-                float prev_data_point_val = Funcs.FromUint(prev_data_point.val);
-                float external_data_point_val = Funcs.FromUint(external_data_point.val);
-                //Test results
-                float Update_result = Sim_Funcs.Update_Data_Calc(prev_data_point_val, external_data_point_val, timestep);
-                input_queue.Enqueue(Update_result);
-                if(input_result.valid){
-                    float result = Funcs.FromUint(input_result.val);
-                    float calc_result = input_queue.Dequeue();
-                    // TODO: Change comparison method
-                    if (calc_result != result){
-                        Console.WriteLine("Internal update data sim: Got {0}, expected {1}", result, calc_result);
-                    }
-                }
-                await ClockAsync();
-            }
-            
-        }
-    }
-
 }

@@ -73,17 +73,9 @@ namespace Acceleration
 
             // Constants
             float MASS_OF_ARGON = 39.948f;
-            float SIGMA = 3.4f;
-            float EPSILON = 0.0103f;
 
             // Constant processes
             var const_mass_of_argon = new Constants(MASS_OF_ARGON);
-
-            // Internal simulation process
-            var internal_acceleration_sim = 
-                new Internal_Acceleration_Sim(MASS_OF_ARGON, SIGMA, EPSILON);
-            internal_acceleration_sim.input_pos1 = input_pos1;
-            internal_acceleration_sim.input_pos2 = input_pos2;
 
             // Calculation processes
             var min             = new Min();
@@ -105,10 +97,7 @@ namespace Acceleration
             div_mass.divident                       = mul.product;
             div_mass.divisor                        = const_mass_of_argon.output;
             output                                  = div_mass.quotient;
-            internal_acceleration_sim.input_result  = div_mass.quotient;
 
-
-            
         }
     }
 
@@ -171,11 +160,6 @@ namespace Acceleration
             var mul_24          = new Mul();
             var minus           = new Min();
             
-
-            //Internal simulation process
-            var internal_force_simulation = new Internal_Force_Sim(SIGMA, EPSILON);
-
-            internal_force_simulation.input_r = input;
             
             /* NOTE: e^{x*ln(b)} == b^x*/
             abs_r.input                             = input;
@@ -219,8 +203,6 @@ namespace Acceleration
             minus.subtrahend                        = mul_24.product;
 
             output                                  = minus.difference;
-            internal_force_simulation.input_result  = minus.difference;
-
         }
     }
 }

@@ -62,12 +62,6 @@ namespace Data_Update
             this.prev_data_point = prev_data_point;
             this.external_data_point = external_data_point;
 
-            // Internal simulation process
-            var internal_simulation = 
-                new Internal_Simulation(timestep);
-            internal_simulation.prev_data_point = prev_data_point;
-            internal_simulation.external_data_point = external_data_point;
-
             // Constants
             var const_timestep = new Constants(timestep);
 
@@ -84,8 +78,6 @@ namespace Data_Update
             add.addend                                  = pipe.output;
 
             updated_data_point                          = add.sum;
-            internal_simulation.input_result            = add.sum;
-
         }
     }
 }
