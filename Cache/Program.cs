@@ -30,7 +30,7 @@ namespace Cache
                     var testing_simulator = new Testing_Simulator(positions, (uint)Cache_size.n);
 
                     // RAM
-                    var acceleration_ram = new AccelerationDataRam((uint)positions.Length);
+                    var acceleration_ram = new Deflib.AccelerationDataRam((uint)positions.Length);
                     
 
                     var acceleration_cache = new AccelerationCache((uint)Cache_size.n);
@@ -54,7 +54,7 @@ namespace Cache
                     ;
                 }
             }
-
+            Console.WriteLine("Simulation completed");
         }
     }
 }

@@ -49,35 +49,9 @@ namespace Data_Update{
             Random rnd = new Random();
 
 
-            // Testing data
-            // Data array is kept float so that the uint bitstream can be
-            // generated correctly
-            float[] random_external_data = new float[data_size];
+            //// Testing data
+
             // Generate random data for testing
-            for(uint i = 0; i < data_size; i++){
-                int random_number = rnd.Next(10,100);
-                if(!random_external_data.Contains((float) random_number))
-                    random_external_data[i] = (float) random_number;
-                else
-                    i--;
-            }
-
-            float[] external_data = new float[data_size];
-            // Generate data for testing
-            for(uint i = 0; i < data_size; i++)
-                external_data[i] = i + 1;
-
-            // Calculate acceleration and add to previous calculations
-            // float[] acceleration = new float[random_external_data.Length];
-            // for(int i = 0; i < random_external_data.Length - 1; i++){
-            //     for(int j = i + 1; j < random_external_data.Length; j++){
-            //         float calculated_result = Sim_Funcs.Acceleration_Calc(random_external_data[i], random_external_data[j]);
-            //         acceleration[i] += calculated_result;
-            //         acceleration[j] -= calculated_result;
-            //     }
-            // }
-
-            // Generate random velocities for testing
             float[] random_data = new float[data_size];
             for(int i = 0; i < data_size; i++){
                 int random_number = rnd.Next(10,1000);
@@ -87,17 +61,39 @@ namespace Data_Update{
                     i--;
             }
 
+            // Creating random or non-random data variables as the external 
+            // variables in the formula
+            float[] random_external_data = new float[data_size];
+            float[] external_data = new float[data_size];
+            
+            // Generate random data for testing
+            for(uint i = 0; i < data_size; i++){
+                int random_number = rnd.Next(10,100);
+                if(!random_external_data.Contains((float) random_number))
+                    random_external_data[i] = (float) random_number;
+                else
+                    i--;
+            }
+
+            // Generate data for testing
+            for(uint i = 0; i < data_size; i++)
+                external_data[i] = i + 1;
+
+
             // Write initial data to ram
             for(int i = 0; i < data_size; i++){
+                // Data points
+                data_point_ramctrl.Enabled = true;
+                data_point_ramctrl.Address = i;
+                data_point_ramctrl.Data = Funcs.FromFloat(random_data[i]);
+                data_point_ramctrl.IsWriting = true;
+
+                // External variable data points
                 external_data_point_ramctrl.Enabled = true;
                 external_data_point_ramctrl.Address = i;
                 external_data_point_ramctrl.Data = Funcs.FromFloat(random_external_data[i]);
                 external_data_point_ramctrl.IsWriting = true;
 
-                data_point_ramctrl.Enabled = true;
-                data_point_ramctrl.Address = i;
-                data_point_ramctrl.Data = Funcs.FromFloat(random_data[i]);
-                data_point_ramctrl.IsWriting = true;
                 await ClockAsync();
             }
             external_data_point_ramctrl.Enabled = false;
@@ -136,6 +132,7 @@ namespace Data_Update{
 
                     if(k-n > 2 || k >= random_external_data.Length){
                         float input_result = Funcs.FromUint(data_point_ramresult.Data);
+                        // TODO: Change comparison method
                         if(updated_data_points[n] != input_result)
                             Console.WriteLine("Update data result - Got {0}, expected {1} at {2}",
                                     input_result, updated_data_points[n], n);
@@ -181,6 +178,7 @@ namespace Data_Update{
                 if(input_result.valid){
                     float result = Funcs.FromUint(input_result.val);
                     float calc_result = input_queue.Dequeue();
+                    // TODO: Change comparison method
                     if (calc_result != result){
                         Console.WriteLine("Internal update data sim: Got {0}, expected {1}", result, calc_result);
                     }

@@ -46,6 +46,7 @@ namespace Data_Update
                 testing_simulator.data_point_ramresult = velocity_ram.ReadResultB;
 
                 sim.Run();
+                Console.WriteLine("Simulation completed");
             }
         }
     }
@@ -73,7 +74,7 @@ namespace Data_Update
             // Calculation processes
             var mul = new Mul();
             var add = new Add();
-            var pipe = new Pipelineregister();
+            var pipe = new PipelineRegister();
 
             mul.multiplicant                            = external_data_point;
             mul.multiplier                              = const_timestep.output;
