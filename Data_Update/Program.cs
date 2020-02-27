@@ -25,7 +25,7 @@ namespace Data_Update
                     new Update(velocity_manager.prev_data_point, 
                                 velocity_manager.external_data_point,timestep_size);
                 
-                var multiplexer = new Multiplexer();
+                var multiplexer = new Multiplexer_ControlB();
 
                 velocity_manager.sim_ready = testing_simulator.sim_ready;
                 velocity_manager.data_ready = testing_simulator.data_ready;
