@@ -271,8 +271,42 @@ namespace Deflib {
         }
     }
 
-    // A multiplexer which should be a clocked process 
-    public class Multiplexer : SimpleProcess
+    // A multiplexer which should not be a clocked process 
+    public class Multiplexer_ControlA : SimpleProcess
+    {
+        [InputBus]
+        public TrueDualPortMemory<uint>.IControlA first_input = Scope.CreateBus<TrueDualPortMemory<uint>.IControlA>();
+        
+        [InputBus]
+        public TrueDualPortMemory<uint>.IControlA second_input = Scope.CreateBus<TrueDualPortMemory<uint>.IControlA>();
+
+        [OutputBus]
+        public TrueDualPortMemory<uint>.IControlA output;
+
+
+        protected override void OnTick()
+        {
+            if(first_input.Enabled){
+                output.Enabled = true;
+                output.Data = first_input.Data;
+                output.Address = first_input.Address;
+                output.IsWriting = first_input.IsWriting;
+            }else if(second_input.Enabled){
+                output.Enabled = true;
+                output.Data = second_input.Data;
+                output.Address = second_input.Address;
+                output.IsWriting = second_input.IsWriting;
+            }else{
+                output.Enabled = false;
+                output.Data = 0;
+                output.Address = 0;
+                output.IsWriting = false;
+            }
+        }
+    }
+
+    // A multiplexer which should not be a clocked process 
+    public class Multiplexer_ControlB : SimpleProcess
     {
         [InputBus]
         public TrueDualPortMemory<uint>.IControlB first_input = Scope.CreateBus<TrueDualPortMemory<uint>.IControlB>();
