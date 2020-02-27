@@ -11,16 +11,19 @@ namespace Acceleration
 
         static void Main(string[] args)
         {
-            for(int i = 0; i < 1; i++){
+            for(int i = 0; i < 2; i++){
                 using(var sim = new Simulation()){
 
+                    // TODO: This fails when data is 1 in size.
                     uint data_size = 10;
                     
                     
                     // RAM
-                    var position_ram1 = new TrueDualPortMemory<uint>((int)data_size);
-                    var position_ram2 = new TrueDualPortMemory<uint>((int)data_size);
+                    var position_ram = new TrueDualPortMemory<uint>((int)data_size);
                     
+                    // Multiplexer
+                    var multiplexer = new Multiplexer_ControlA();
+
                     // TODO: Give the data_size to manager as an argument
                     var manager = new Manager();
 
@@ -30,17 +33,14 @@ namespace Acceleration
                     
 
 
-                    manager.input = testing_simulator.output;
-                    manager.pos1_ramctrl = position_ram1.ControlA;
-                    manager.pos2_ramctrl = position_ram2.ControlA;
-                    manager.pos1_ramresult = position_ram1.ReadResultA;
-                    manager.pos2_ramresult = position_ram2.ReadResultA;
-
-                    testing_simulator.input = acceleration.output;
-                    testing_simulator.pos1_ramctrl = position_ram1.ControlB;
-                    testing_simulator.pos2_ramctrl = position_ram2.ControlB;
-
-                    testing_simulator.input = acceleration.output;
+                    manager.ready = testing_simulator.ready_signal;
+                    testing_simulator.position_ramctrl = multiplexer.first_input;
+                    manager.pos1_ramctrl = multiplexer.second_input;
+                    multiplexer.output = position_ram.ControlA;
+                    manager.pos2_ramctrl = position_ram.ControlB;
+                    manager.pos1_ramresult = position_ram.ReadResultA;
+                    manager.pos2_ramresult = position_ram.ReadResultB;
+                    testing_simulator.testing_result_input = acceleration.output;
                     
                     
                     sim

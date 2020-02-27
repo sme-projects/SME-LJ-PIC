@@ -10,13 +10,13 @@ namespace Acceleration {
     public class Manager : SimpleProcess
     {
         [InputBus]
-        public ValBus input;
+        public ValBus ready;
 
         [InputBus]
         public TrueDualPortMemory<uint>.IReadResultA pos1_ramresult;
         
         [InputBus]
-        public TrueDualPortMemory<uint>.IReadResultA pos2_ramresult;
+        public TrueDualPortMemory<uint>.IReadResultB pos2_ramresult;
 
         [OutputBus]
         public ValBus pos1_output = Scope.CreateBus<ValBus>();
@@ -24,6 +24,9 @@ namespace Acceleration {
         [OutputBus]
         public ValBus pos2_output = Scope.CreateBus<ValBus>();
         
+        // TODO: This ready signal for the cache should probably be
+        // from some other process than this.
+        // This is not used in the internal module
         [OutputBus]
         public ValBus acceleration_ready_output = Scope.CreateBus<ValBus>();
 
@@ -31,7 +34,7 @@ namespace Acceleration {
         public TrueDualPortMemory<uint>.IControlA pos1_ramctrl;
 
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlA pos2_ramctrl;
+        public TrueDualPortMemory<uint>.IControlB pos2_ramctrl;
 
 
         bool running = false;
@@ -46,11 +49,11 @@ namespace Acceleration {
             pos2_ramctrl.Enabled = false;
 
             // The input is only valid once for each simulation. 
-            if(input.valid){
+            if(ready.valid){
                 clock_count = 0;
                 i = 0;
                 j = 1;
-                length = input.val; 
+                length = ready.val; 
                 running = true;
                 acceleration_ready_output.val = length;
                 acceleration_ready_output.valid = true;

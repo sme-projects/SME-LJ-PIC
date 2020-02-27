@@ -12,15 +12,16 @@ namespace Acceleration{
     public class Testing_Simulation : SimulationProcess
     {
         [InputBus]
-        public ValBus input;
+        public ValBus acceleration_ready_signal;
+        
+        [InputBus]
+        public ValBus testing_result_input;
 
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlB pos1_ramctrl;
-        [OutputBus]
-        public TrueDualPortMemory<uint>.IControlB pos2_ramctrl;
+        public TrueDualPortMemory<uint>.IControlA position_ramctrl;
 
         [OutputBus]
-        public ValBus output = Scope.CreateBus<ValBus>();
+        public ValBus ready_signal = Scope.CreateBus<ValBus>();
 
         public Testing_Simulation(uint data_size){
             this.data_size = data_size;
@@ -48,38 +49,33 @@ namespace Acceleration{
                 // positions[k] = (float) k + 1;
             }
             
+            // Write data to ram
             for(int k = 0; k < positions.Length; k++){
-                pos1_ramctrl.Enabled = true;
-                pos1_ramctrl.Address = k;
-                pos1_ramctrl.Data = Funcs.FromFloat(positions[k]);
-                pos1_ramctrl.IsWriting = true;
-
-                pos2_ramctrl.Enabled = true;
-                pos2_ramctrl.Address = k;
-                pos2_ramctrl.Data = Funcs.FromFloat(positions[k]);
-                pos2_ramctrl.IsWriting = true;
+                position_ramctrl.Address = k;
+                position_ramctrl.Data = Funcs.FromFloat(positions[k]);
+                position_ramctrl.IsWriting = true;
+                position_ramctrl.Enabled = true;
                 await ClockAsync();
             }
             bool running = true;
-            pos1_ramctrl.Enabled = false;
-            pos2_ramctrl.Enabled = false;
-            output.val = (uint)positions.Length;
-            output.valid = true;
+            position_ramctrl.Enabled = false;
+            ready_signal.val = (uint)positions.Length;
+            ready_signal.valid = true;
             await ClockAsync();
-            output.valid = false;
+            ready_signal.valid = false;
 
             int i = 0;
             int j = 1;
             Queue<float> calculated_result_queue = new Queue<float>();
             while(running){
 
-                if(input.valid){
+                if(testing_result_input.valid){
                     // TODO: Rename the control result to something with "control result"
                     float calculated_result = Sim_Funcs.Acceleration_Calc(positions[i], positions[j]);
                     calculated_result_queue.Enqueue(calculated_result);
                     if(i <= data_size -2 && j <= data_size -1){
                         float calc_result = calculated_result_queue.Dequeue();
-                        float input_result = Funcs.FromUint(input.val);
+                        float input_result = Funcs.FromUint(testing_result_input.val);
 
                         // TODO: Figure out what the expected and accepted difference can be
                         if(Math.Abs(calc_result - input_result) > 1/(Math.Pow(10,7))){
