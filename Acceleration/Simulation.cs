@@ -59,7 +59,7 @@ namespace Acceleration{
             }
             bool running = true;
             position_ramctrl.Enabled = false;
-            ready_signal.val = (uint)positions.Length;
+            ready_signal.val = data_size;
             ready_signal.valid = true;
             await ClockAsync();
             ready_signal.valid = false;

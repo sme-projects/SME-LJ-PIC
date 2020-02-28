@@ -11,55 +11,52 @@ namespace Lennard_Jones
         {
             using(var sim = new Simulation())
             {
-                // TODO: It should handle edge cases, such as lower than 12 in 
-                // amount of data
-                uint size = 40;
-                float[] positions = new float[size];
-                // size : 12
-                for(int i = 0; i < size; i++){
-                    positions[i] = i+1;
-                    // Console.WriteLine(i);
-                }
-
-                // int cache_size = 4;
+                uint data_size = 40;
 
                 // RAM
-                var position_ram1 = new TrueDualPortMemory<uint>(positions.Length);
-                var position_ram2 = new TrueDualPortMemory<uint>(positions.Length);
-                var acceleration_ram = new AccelerationDataRam((uint)positions.Length);
-                // Manager
-                var manager = new Manager();
+                var position_ram = new TrueDualPortMemory<uint>((int)data_size);
+                // var velocity_ram = new TrueDualPortMemory<uint>(positions.Length);
+                var acceleration_ram = new AccelerationDataRam(data_size);
                 
+                //External simulation process
+                var external_simulator = new External_Sim(data_size, (uint)Cache_size.n);
+
+                // Managers
+                var acceleration_manager = new Acceleration.Manager();
+                
+                // Multiplexers
+                var init_data_multiplexer = new Multiplexer_ControlA();
+
+                // Cache
                 var acceleration_cache = new Cache.AccelerationCache((uint)Cache_size.n);
                 
-                
-
+                // Acceleration class
                 Acceleration.Acceleration acceleration = 
-                    new Acceleration.Acceleration(manager.pos1_output,
-                                     manager.pos2_output);
+                    new Acceleration.Acceleration(acceleration_manager.pos1_output,
+                                     acceleration_manager.pos2_output);
 
 
-                //External simulation process
-                var external_simulator = new External_Sim(positions, (uint)Cache_size.n);
+                // Connections
+                external_simulator.pos_ramctrl = init_data_multiplexer.first_input;
+                acceleration_manager.pos1_ramctrl = init_data_multiplexer.second_input;
 
-                external_simulator.pos1_ramctrl = position_ram1.ControlB;
-                external_simulator.pos2_ramctrl = position_ram2.ControlB;
-                manager.input = external_simulator.output;
+                init_data_multiplexer.output = position_ram.ControlA;
+                acceleration_manager.ready = external_simulator.ready;
 
-                manager.pos1_ramctrl = position_ram1.ControlA;
-                manager.pos2_ramctrl = position_ram2.ControlA;
-                manager.pos1_ramresult = position_ram1.ReadResultA;
-                manager.pos2_ramresult = position_ram2.ReadResultA;
+                // acceleration_manager.pos1_ramctrl = position_ram.ControlA;
+                acceleration_manager.pos2_ramctrl = position_ram.ControlB;
+                acceleration_manager.pos1_ramresult = position_ram.ReadResultA;
+                acceleration_manager.pos2_ramresult = position_ram.ReadResultB;
 
                 // var testprocess = new Test();
                 acceleration_cache.acceleration_input = acceleration.output;
                 // acceleration_cache.acceleration_input = testprocess.output;
-                acceleration_cache.ready = manager.acceleration_ready_output;
+                acceleration_cache.ready = acceleration_manager.acceleration_ready_output;
                 acceleration_cache.acc_ramctrl = acceleration_ram.ControlA;
                 acceleration_cache.acc_ramresult = acceleration_ram.ReadResultA;
                 external_simulator.acc_ramctrl = acceleration_ram.ControlB;
                 external_simulator.acc_ramresult = acceleration_ram.ReadResultB;
-                external_simulator.input = acceleration_cache.output;
+                external_simulator.result_ready = acceleration_cache.output;
 
                 // sim.Run(null, () => true);
                 sim.Run();

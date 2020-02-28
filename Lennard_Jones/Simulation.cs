@@ -4,13 +4,15 @@ using SME.Components;
 using Deflib;
 using Acceleration;
 
+using System.Linq;
+
 namespace Lennard_Jones 
 {
 
     public class External_Sim : SimulationProcess
     {
         [InputBus]
-        public FlagBus input;
+        public FlagBus result_ready;
     
         [InputBus]
         public RamResultUint acc_ramresult;
@@ -18,24 +20,21 @@ namespace Lennard_Jones
         [OutputBus]
         public RamCtrlUint acc_ramctrl;
         
-        
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlB pos1_ramctrl;
-        [OutputBus]
-        public TrueDualPortMemory<uint>.IControlB pos2_ramctrl;
+        public TrueDualPortMemory<uint>.IControlA pos_ramctrl;
 
         [OutputBus]
-        public ValBus output = Scope.CreateBus<ValBus>();
+        public ValBus ready = Scope.CreateBus<ValBus>();
 
         
 
-        public External_Sim(float[] positions, uint cache_size)
+        public External_Sim(uint data_size, uint cache_size)
         {
-            this.positions = positions;
+            this.data_size = data_size;
             this.cache_size = cache_size;
         }
 
-        private float[] positions;
+        private uint data_size;
         private uint cache_size;
 
         public override async System.Threading.Tasks.Task Run() 
@@ -43,101 +42,77 @@ namespace Lennard_Jones
             // Initial await
             await ClockAsync();
 
-            for(int i = 0; i < positions.Length; i++){
-                pos1_ramctrl.Enabled = true;
-                pos1_ramctrl.Address = i;
-                pos1_ramctrl.Data = Funcs.FromFloat(positions[i]);
-                pos1_ramctrl.IsWriting = true;
+            Random rnd = new Random();
+            // Testing data
+            // Positions array is kept float so that the uint bitstream can be
+            // generated correctly
+            float[] positions = new float[data_size];
+            for(uint k = 0; k < data_size; k++){
+                int random_number = rnd.Next(10,1000);
+                float float_rnd_number = random_number;
+                if(!positions.Contains((float) random_number))
+                    positions[k] = (float) random_number;
+                else
+                    k--;
+                // Non-random data:
+                // positions[k] = (float) k + 1;
+            }
 
-                pos2_ramctrl.Enabled = true;
-                pos2_ramctrl.Address = i;
-                pos2_ramctrl.Data = Funcs.FromFloat(positions[i]);
-                pos2_ramctrl.IsWriting = true;
+            for(int k = 0; k < positions.Length; k++){
+                pos_ramctrl.Address = k;
+                pos_ramctrl.Data = Funcs.FromFloat(positions[k]);
+                pos_ramctrl.IsWriting = true;
+                pos_ramctrl.Enabled = true;
+
                 await ClockAsync();
             }
 
             bool running = true;
-            pos1_ramctrl.Enabled = false;
-            pos2_ramctrl.Enabled = false;
-            output.val = (uint)positions.Length;
-            output.valid = true;
+            pos_ramctrl.Enabled = false;
+            ready.val = data_size;
+            ready.valid = true;
             await ClockAsync();
-            output.valid = false;
-            // Calculating data for checking results
+            ready.valid = false;
+
+
+            // Calculating data for verifying results
             float[] accelerations = new float[positions.Length];
-            for(int i = 0; i < positions.Length; i++){
-                for(int j = i + 1; j < positions.Length; j++){
-                    float result = Sim_Funcs.Acceleration_Calc(positions[i], positions[j]);
-                    accelerations[i] += result;
-                    accelerations[j] += - result;
+            for(int k = 0; k < positions.Length; k++){
+                for(int n = k + 1; n < positions.Length; n++){
+                    float result = Sim_Funcs.Acceleration_Calc(positions[k], positions[n]);
+                    accelerations[k] += result;
+                    accelerations[n] += - result;
                 }
             }
 
-            // uint count = 29;
-            // float[] test_accelerations = new float[positions.Length];
-            // for(int i = 0; i < positions.Length; i++){
-            //     for(int j = i + 1; j < positions.Length; j++){
-            //         // float result = co
-            //         test_accelerations[i] += count;
-            //         test_accelerations[j] += - count;
-            //         count++;
-            //     }
-            // }
-            // uint k = 0;
+            uint i = 0;
+            uint j = 0;
+            uint ready_to_read = 0;
 
             while(running){
-                uint i = 0;
-                int data_size = positions.Length;
+
                 acc_ramctrl.Enabled = true;
                 acc_ramctrl.Data = 0;
                 acc_ramctrl.IsWriting = false;
-                while(i < data_size){
-                    Console.WriteLine("i : {0}", i);
-                    while(!input.valid) {
-                        await ClockAsync();    
-                    }
-                    // uint size = input.val;
-                    for(uint j = 0; j < cache_size+1; j++){
-                        acc_ramctrl.Address = i + j;
-                        await ClockAsync();
-                        if(j >= 1){
-                            float input_result = Funcs.FromUint(acc_ramresult.Data);
-                            if(accelerations[i+j-1] != input_result)
-                            // if(test_accelerations[i+j-1] != input_result)
-
-                                 Console.WriteLine("Acceleration result - Got {0}, expected {1} at {2}", 
-                                 input_result, accelerations[i+j-1], i+j-1);
-                                //  input_result, test_accelerations[i+j-1], i+j-1);
-                            // Console.WriteLine("result is: {0}", Funcs.FromUint(acc_ramresult.Data));
-                        }
-                    }
-                    i += (uint)cache_size;
-
+                if(result_ready.valid){
+                    ready_to_read += cache_size;
                 }
-                
-                // TODO: Must be able to repeat which is not possible now
-                running = false;
-                // if(Funcs.FromUint(acc_ramresult.Data) == -2460.20117){
-                //     running = false;
-                // }
-                // await ClockAsync();
-                // await ClockAsync();
-                
-                // // float input_result = Funcs.FromUint(acc_ramresult.Data);
-                // // Dequeueing the data along to check the results against the C# calculation
-                // (uint, uint) tuple = position_queue.Dequeue();
-                // float acceleration_calc_result = Sim_Funcs.Acceleration_Calc(pos1, pos2);
-                // if(acceleration_calc_result != input_result){
-                //     Console.WriteLine("Acceleration result - Got {0}, expected {1}", input_result, acceleration_calc_result);
-                // }else{
-                //     Console.WriteLine("Acceleration result - Got {0}, expected {1}", input_result, acceleration_calc_result);
-                // }
-                // if(position_queue.Count == 0){
-                //     running = false;
-                // }
-                // k++;
-                
-                // await ClockAsync();
+
+                if(i-j >= 2 || i >= positions.Length){
+                    float input_result = Funcs.FromUint(acc_ramresult.Data);
+                    if(accelerations[j] - input_result > 0.0f)
+                        Console.WriteLine("Acceleration result - Got {0}, expected {1} at {2}",
+                                input_result, accelerations[j], j);
+                    j++;
+                }
+
+                if(i < ready_to_read){
+                    acc_ramctrl.Address = i;
+                    i++;
+                }
+                if(j >= positions.Length)
+                    running = false;
+                await ClockAsync();
             }
         }
     }
