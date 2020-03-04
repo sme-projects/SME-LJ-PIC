@@ -4,10 +4,6 @@ using Deflib;
 
 namespace Cache
 {
-    // public enum Cache_size : int{
-    //     n = 4,
-    // };
-    
     class Program
     {
 

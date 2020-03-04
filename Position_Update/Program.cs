@@ -25,7 +25,7 @@ namespace Position_Update
 
                 Update_position update_position = 
                     new Update_position(position_manager.prev_data_point, 
-                                position_manager.external_data_point,timestep_size);
+                                position_manager.velocity_data_point,timestep_size);
                 
                 var multiplexer = new Multiplexer_ControlB();
 
@@ -37,14 +37,14 @@ namespace Position_Update
                 position_manager.data_point_ramctrl = position_ram.ControlA;
                 position_manager.data_point_ramresult = position_ram.ReadResultA;
 
-                position_manager.external_data_point_ramctrl = velocity_ram.ControlA;
-                position_manager.external_data_point_ramresult = velocity_ram.ReadResultA;
+                position_manager.velocity_data_point_ramctrl = velocity_ram.ControlA;
+                position_manager.velocity_data_point_ramresult = velocity_ram.ReadResultA;
 
                 position_manager.updated_data_point_ramctrl = multiplexer.first_input;
                 testing_simulator.data_point_ramctrl = multiplexer.second_input;
                 multiplexer.output = position_ram.ControlB;
                 
-                testing_simulator.external_data_point_ramctrl = velocity_ram.ControlB;
+                testing_simulator.velocity_data_point_ramctrl = velocity_ram.ControlB;
                 testing_simulator.data_point_ramresult = position_ram.ReadResultB;
 
                 sim.Run();
@@ -56,13 +56,13 @@ namespace Position_Update
     public class Update_position
     {
         public ValBus prev_data_point;
-        public ValBus external_data_point;
+        public ValBus velocity_data_point;
         public ValBus updated_data_point;
 
-        public Update_position(ValBus prev_data_point, ValBus external_data_point, float timestep)
+        public Update_position(ValBus prev_data_point, ValBus velocity_data_point, float timestep)
         {
             this.prev_data_point = prev_data_point;
-            this.external_data_point = external_data_point;
+            this.velocity_data_point = velocity_data_point;
 
             // Constants
             var const_timestep = new Constants(timestep);
@@ -72,7 +72,7 @@ namespace Position_Update
             var add = new Add();
             var pipe = new PipelineRegister();
 
-            mul.multiplicant                            = external_data_point;
+            mul.multiplicant                            = velocity_data_point;
             mul.multiplier                              = const_timestep.output;
             pipe.input                                  = prev_data_point;
 

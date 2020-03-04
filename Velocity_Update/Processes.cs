@@ -21,10 +21,10 @@ namespace Velocity_Update
         public ValBus updated_data_point;
 
         [InputBus]
-        public RamResultUint external_data_point_ramresult;
+        public RamResultUint acceleration_data_point_ramresult;
         
         [OutputBus]
-        public RamCtrlUint external_data_point_ramctrl;
+        public RamCtrlUint acceleration_data_point_ramctrl;
 
         [InputBus]
         public TrueDualPortMemory<uint>.IReadResultA data_point_ramresult;
@@ -33,7 +33,7 @@ namespace Velocity_Update
         public ValBus prev_data_point = Scope.CreateBus<ValBus>();
         
         [OutputBus]
-        public ValBus external_data_point = Scope.CreateBus<ValBus>();
+        public ValBus acceleration_data_point = Scope.CreateBus<ValBus>();
         
         [OutputBus]
         public FlagBus finished = Scope.CreateBus<FlagBus>();
@@ -61,7 +61,7 @@ namespace Velocity_Update
             if(sim_ready.valid){
                 index = 0;
                 result_index = 0;
-                external_data_point_ramctrl.Enabled = false;
+                acceleration_data_point_ramctrl.Enabled = false;
                 data_point_ramctrl.Enabled = false;
             }
             if(data_ready.valid){
@@ -69,10 +69,10 @@ namespace Velocity_Update
             }
             if(running){
                 // TODO: Must read cache size at a time
-                external_data_point_ramctrl.Enabled = index < data_size;
-                external_data_point_ramctrl.Address = index;
-                external_data_point_ramctrl.Data = 0;
-                external_data_point_ramctrl.IsWriting = false;
+                acceleration_data_point_ramctrl.Enabled = index < data_size;
+                acceleration_data_point_ramctrl.Address = index;
+                acceleration_data_point_ramctrl.Data = 0;
+                acceleration_data_point_ramctrl.IsWriting = false;
 
                 data_point_ramctrl.Enabled = index < data_size;
                 data_point_ramctrl.Address = (int)index;
@@ -80,12 +80,12 @@ namespace Velocity_Update
                 data_point_ramctrl.IsWriting = false;
 
                 if(index >= 2 && index <= data_size + 1){
-                    external_data_point.val = external_data_point_ramresult.Data;
+                    acceleration_data_point.val = acceleration_data_point_ramresult.Data;
                     prev_data_point.val = data_point_ramresult.Data;
-                    external_data_point.valid = true;
+                    acceleration_data_point.valid = true;
                     prev_data_point.valid = true;
                 }else{
-                    external_data_point.valid = false;
+                    acceleration_data_point.valid = false;
                     prev_data_point.valid = false;
                 }
                 if(result_index >= data_size){

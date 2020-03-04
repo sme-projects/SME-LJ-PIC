@@ -20,7 +20,7 @@ namespace Position_Update
         public ValBus updated_data_point;
 
         [InputBus]
-        public TrueDualPortMemory<uint>.IReadResultA external_data_point_ramresult;
+        public TrueDualPortMemory<uint>.IReadResultA velocity_data_point_ramresult;
 
         [InputBus]
         public TrueDualPortMemory<uint>.IReadResultA data_point_ramresult;
@@ -29,13 +29,13 @@ namespace Position_Update
         public ValBus prev_data_point = Scope.CreateBus<ValBus>();
         
         [OutputBus]
-        public ValBus external_data_point = Scope.CreateBus<ValBus>();
+        public ValBus velocity_data_point = Scope.CreateBus<ValBus>();
         
         [OutputBus]
         public FlagBus finished = Scope.CreateBus<FlagBus>();
         
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlA external_data_point_ramctrl;
+        public TrueDualPortMemory<uint>.IControlA velocity_data_point_ramctrl;
 
         [OutputBus]
         public TrueDualPortMemory<uint>.IControlA data_point_ramctrl;
@@ -60,17 +60,17 @@ namespace Position_Update
             if(sim_ready.valid){
                 index = 0;
                 result_index = 0;
-                external_data_point_ramctrl.Enabled = false;
+                velocity_data_point_ramctrl.Enabled = false;
                 data_point_ramctrl.Enabled = false;
             }
             if(data_ready.valid){
                 running = true;
             }
             if(running){
-                external_data_point_ramctrl.Enabled = index < data_size;
-                external_data_point_ramctrl.Address = index;
-                external_data_point_ramctrl.Data = 0;
-                external_data_point_ramctrl.IsWriting = false;
+                velocity_data_point_ramctrl.Enabled = index < data_size;
+                velocity_data_point_ramctrl.Address = index;
+                velocity_data_point_ramctrl.Data = 0;
+                velocity_data_point_ramctrl.IsWriting = false;
 
                 data_point_ramctrl.Enabled = index < data_size;
                 data_point_ramctrl.Address = index;
@@ -78,12 +78,12 @@ namespace Position_Update
                 data_point_ramctrl.IsWriting = false;
 
                 if(index >= 2 && index <= data_size + 1){
-                    external_data_point.val = external_data_point_ramresult.Data;
+                    velocity_data_point.val = velocity_data_point_ramresult.Data;
                     prev_data_point.val = data_point_ramresult.Data;
-                    external_data_point.valid = true;
+                    velocity_data_point.valid = true;
                     prev_data_point.valid = true;
                 }else{
-                    external_data_point.valid = false;
+                    velocity_data_point.valid = false;
                     prev_data_point.valid = false;
                 }
                 if(result_index >= data_size){

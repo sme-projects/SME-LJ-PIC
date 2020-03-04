@@ -26,7 +26,7 @@ namespace Velocity_Update
 
                 Update_velocity velocity = 
                     new Update_velocity(velocity_manager.prev_data_point, 
-                                velocity_manager.external_data_point,timestep_size);
+                                velocity_manager.acceleration_data_point,timestep_size);
                 
                 var multiplexer = new Multiplexer_ControlB();
 
@@ -38,8 +38,8 @@ namespace Velocity_Update
                 velocity_manager.data_point_ramctrl = velocity_ram.ControlA;
                 velocity_manager.data_point_ramresult = velocity_ram.ReadResultA;
 
-                velocity_manager.external_data_point_ramctrl = acceleration_ram.ControlB;
-                velocity_manager.external_data_point_ramresult = acceleration_ram.ReadResultB;
+                velocity_manager.acceleration_data_point_ramctrl = acceleration_ram.ControlB;
+                velocity_manager.acceleration_data_point_ramresult = acceleration_ram.ReadResultB;
 
                 velocity_manager.updated_data_point_ramctrl = multiplexer.first_input;
                 testing_simulator.velocity_ramctrl = multiplexer.second_input;
@@ -57,13 +57,13 @@ namespace Velocity_Update
     public class Update_velocity
     {
         public ValBus prev_data_point;
-        public ValBus external_data_point;
+        public ValBus acceleration_data_point;
         public ValBus updated_data_point;
 
-        public Update_velocity(ValBus prev_data_point, ValBus external_data_point, float timestep)
+        public Update_velocity(ValBus prev_data_point, ValBus acceleration_data_point, float timestep)
         {
             this.prev_data_point = prev_data_point;
-            this.external_data_point = external_data_point;
+            this.acceleration_data_point = acceleration_data_point;
 
             // Constants
             var const_timestep = new Constants(timestep);
@@ -73,7 +73,7 @@ namespace Velocity_Update
             var add = new Add();
             var pipe = new PipelineRegister();
 
-            mul.multiplicant                            = external_data_point;
+            mul.multiplicant                            = acceleration_data_point;
             mul.multiplier                              = const_timestep.output;
             pipe.input                                  = prev_data_point;
 
