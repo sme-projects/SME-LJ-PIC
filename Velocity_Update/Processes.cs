@@ -3,9 +3,10 @@ using SME;
 using SME.Components;
 using Deflib;
 
-namespace Data_Update
+namespace Velocity_Update
 {
 
+    // Velocity manager is fetching data from a specialised acceleration ram.
     [ClockedProcess]
     public class Manager : SimpleProcess
     {
@@ -20,7 +21,10 @@ namespace Data_Update
         public ValBus updated_data_point;
 
         [InputBus]
-        public TrueDualPortMemory<uint>.IReadResultA external_data_point_ramresult;
+        public RamResultUint external_data_point_ramresult;
+        
+        [OutputBus]
+        public RamCtrlUint external_data_point_ramctrl;
 
         [InputBus]
         public TrueDualPortMemory<uint>.IReadResultA data_point_ramresult;
@@ -35,9 +39,6 @@ namespace Data_Update
         public FlagBus finished = Scope.CreateBus<FlagBus>();
         
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlA external_data_point_ramctrl;
-
-        [OutputBus]
         public TrueDualPortMemory<uint>.IControlA data_point_ramctrl;
 
         [OutputBus]
@@ -46,7 +47,7 @@ namespace Data_Update
         uint data_size;
         float delta_timestep;
 
-        int index = 0;
+        uint index = 0;
         int result_index = 0;
         bool running = false;
 
@@ -67,13 +68,14 @@ namespace Data_Update
                 running = true;
             }
             if(running){
+                // TODO: Must read cache size at a time
                 external_data_point_ramctrl.Enabled = index < data_size;
                 external_data_point_ramctrl.Address = index;
                 external_data_point_ramctrl.Data = 0;
                 external_data_point_ramctrl.IsWriting = false;
 
                 data_point_ramctrl.Enabled = index < data_size;
-                data_point_ramctrl.Address = index;
+                data_point_ramctrl.Address = (int)index;
                 data_point_ramctrl.Data = 0;
                 data_point_ramctrl.IsWriting = false;
 
