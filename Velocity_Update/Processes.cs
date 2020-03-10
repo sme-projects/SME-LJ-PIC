@@ -18,7 +18,7 @@ namespace Velocity_Update
         public FlagBus data_ready;
 
         [InputBus]
-        public ValBus updated_data_point;
+        public ValBus updated_velocity;
 
         [InputBus]
         public RamResultUint acceleration_data_point_ramresult;
@@ -27,10 +27,10 @@ namespace Velocity_Update
         public RamCtrlUint acceleration_data_point_ramctrl;
 
         [InputBus]
-        public TrueDualPortMemory<uint>.IReadResultA data_point_ramresult;
+        public TrueDualPortMemory<uint>.IReadResultA velocity_ramresult;
 
         [OutputBus]
-        public ValBus prev_data_point = Scope.CreateBus<ValBus>();
+        public ValBus prev_velocity = Scope.CreateBus<ValBus>();
         
         [OutputBus]
         public ValBus acceleration_data_point = Scope.CreateBus<ValBus>();
@@ -39,17 +39,19 @@ namespace Velocity_Update
         public FlagBus finished = Scope.CreateBus<FlagBus>();
         
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlA data_point_ramctrl;
+        public TrueDualPortMemory<uint>.IControlA velocity_ramctrl;
 
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlB updated_data_point_ramctrl;
+        public TrueDualPortMemory<uint>.IControlB updated_velocity_ramctrl;
 
         uint data_size;
         float delta_timestep;
 
         uint index = 0;
+        uint ram_return_index = 0;
         int result_index = 0;
         bool running = false;
+        uint ready_to_read = 0;
 
         public Manager(uint size, float timestep){
             data_size = size;
@@ -62,49 +64,63 @@ namespace Velocity_Update
                 index = 0;
                 result_index = 0;
                 acceleration_data_point_ramctrl.Enabled = false;
-                data_point_ramctrl.Enabled = false;
+                velocity_ramctrl.Enabled = false;
+                finished.valid = false;
             }
             if(data_ready.valid){
                 running = true;
+                ready_to_read += (uint)Cache_size.n;
             }
             if(running){
-                // TODO: Must read cache size at a time
                 acceleration_data_point_ramctrl.Enabled = index < data_size;
-                acceleration_data_point_ramctrl.Address = index;
                 acceleration_data_point_ramctrl.Data = 0;
-                acceleration_data_point_ramctrl.IsWriting = false;
+                acceleration_data_point_ramctrl.IsWriting = false;          
 
-                data_point_ramctrl.Enabled = index < data_size;
-                data_point_ramctrl.Address = (int)index;
-                data_point_ramctrl.Data = 0;
-                data_point_ramctrl.IsWriting = false;
+                velocity_ramctrl.Enabled = index < data_size;
+                velocity_ramctrl.Data = 0;
+                velocity_ramctrl.IsWriting = false;
 
-                if(index >= 2 && index <= data_size + 1){
+
+                // Get data from ram and send it to velocity calculation
+                if(index - ram_return_index >= 2 || index >= data_size){
                     acceleration_data_point.val = acceleration_data_point_ramresult.Data;
-                    prev_data_point.val = data_point_ramresult.Data;
+                    prev_velocity.val = velocity_ramresult.Data;
                     acceleration_data_point.valid = true;
-                    prev_data_point.valid = true;
+                    prev_velocity.valid = true;
+                    ram_return_index++;
                 }else{
                     acceleration_data_point.valid = false;
-                    prev_data_point.valid = false;
+                    prev_velocity.valid = false;
                 }
+
+                // Update velocity and acceleration ram addresses
+                if(index < ready_to_read){
+                    acceleration_data_point_ramctrl.Address = index;
+                    velocity_ramctrl.Address = (int)index;
+                    index++;
+                } else {
+                    // to avoid read and write to same address
+                    velocity_ramctrl.Enabled = false;
+                }
+
+
                 if(result_index >= data_size){
                     finished.valid = true;
                     running = false;
                 }
-                if(updated_data_point.valid){
-                    updated_data_point_ramctrl.Enabled = result_index < data_size;
-                    updated_data_point_ramctrl.Address = result_index;
-                    updated_data_point_ramctrl.Data = updated_data_point.val;
-                    updated_data_point_ramctrl.IsWriting = true;
+                // Write updated velocity to velocity ram
+                if(updated_velocity.valid){
+                    updated_velocity_ramctrl.Enabled = result_index < data_size;
+                    updated_velocity_ramctrl.Address = result_index;
+                    updated_velocity_ramctrl.Data = updated_velocity.val;
+                    updated_velocity_ramctrl.IsWriting = true;
                     result_index++;
                 }else{
-                    updated_data_point_ramctrl.Enabled = false;
-                    updated_data_point_ramctrl.Address = 0;
-                    updated_data_point_ramctrl.Data = 0;
-                    updated_data_point_ramctrl.IsWriting = false;
+                    updated_velocity_ramctrl.Enabled = false;
+                    updated_velocity_ramctrl.Address = 0;
+                    updated_velocity_ramctrl.Data = 0;
+                    updated_velocity_ramctrl.IsWriting = false;
                 }
-                index++;
             }
         }
     }
