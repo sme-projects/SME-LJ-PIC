@@ -52,106 +52,106 @@
 
 % -------------------------------------------------
 % Acceleration 1.1
-%
-% \begin{figure}
-%     \centering
-%     \scalebox{0.7}{
-%         \begin{tikzpicture}
-%             \node[ram] (posram1) at (5,2) {Position RAM 1};
-%             \node[ram] (posram2) at (5,-1) {Position RAM 2};
-%             \node[process] (manager) at (0,.5) {Manager};
-%             \node[simulation] (testsim) at (0,4) {Testing Simulator};
-%             \node[module] (acceleration) at (0,-3) {Acceleration};
-%             \node[module] (force) at (0,-6.5) {Force};
-%
-%             \path[draw, ->] (testsim.350) -| (posram1.90) node [near end] {\footnotesize pos};
-%             \path[draw, ->] (testsim.10) -| (7.5,-1) |- (posram2.0) node [near end] {\footnotesize pos};
-%
-%             \path[draw, ->] (manager.30) -| (2.5,2) |- (posram1.170) node [near end] {\footnotesize i};
-%             \path[draw, ->] (manager.330) -| (2.5,0) |- (posram2.190) node [below,near end] {\footnotesize j};
-%
-%             \path[draw, ->, red] (posram1.190) -| (3,1.5) |- (manager.10) node [near start] {\footnotesize pos1};
-%             \path[draw, ->, red] (posram2.170) -| (3,0) |- (manager.350) node [right,pos=0] {\footnotesize pos2};
-%
-%             \path[draw, ->] (testsim.270) -- (manager.90) node [midway] {\footnotesize ready};
-%
-%             \path[draw, ->] (manager.235) -- (acceleration.116) node [midway] {\footnotesize pos1};
-%             \path[draw, ->] (manager.305) -- (acceleration.64) node [midway] {\footnotesize pos2};
-%
-%             \path[draw, ->] (acceleration.250) -- (force.110) node [midway, left] {\footnotesize distance};
-%             \path[draw, ->] (force.70) -- (acceleration.290) node [midway, right] {\footnotesize force};
-%
-%             \path[draw, ->] (acceleration.180) -| (-2, -3) |- (testsim.180) node [near start] {\footnotesize acceleration};
-%
-%         \end{tikzpicture}
-%     }
-%     \caption{Acceleration module 1.1}
-% \end{figure}
-%
-% % -------------------------------------------------
-% % Acceleration 1.2
-%
-% \begin{figure}
-%     \centering
-%     \scalebox{0.7}{
-%         \begin{tikzpicture}
-%             \node[ram] (posram) at (6.5,1) {Position RAM};
-%             \node[multiplexer] (mux) at (3.5,1) {};
-%             \node[process] (manager) at (0,-.5) {Manager};
-%             \node[simulation] (testsim) at (0,3) {Testing Simulator};
-%             \node[module] (acceleration) at (0,-3.5) {Acceleration};
-%             \node[module] (force) at (0,-6.5) {Force};
-%
-%             \path[draw, ->] (testsim.0) -| (2,3) |- (mux.north west) node [near end] {\footnotesize (1.) pos};
-%             \path[draw, ->] (manager.30) -| (2,0) |- (mux.south west) node [near end] {\footnotesize (2.) i};
-%
-%             \path[draw, ->] (manager.10) -| (4.5,0) |- (posram.195) node [near end, below] {\footnotesize j};
-%
-%             \path[draw, ->, red] (posram.250) |-  (manager.350) node [near start, left] {\footnotesize pos1};
-%             \path[draw, ->, red] (posram.290) |-  (manager.330) node [near start] {\footnotesize pos2};
-%
-%             \path[draw, ->] (mux.top side) -- (posram.180) node [midway] {\footnotesize i/pos};
-%
-%
-%             \path[draw, ->] (testsim.270) -- (manager.90) node [midway] {\footnotesize ready};
-%
-%             \path[draw, ->] (manager.235) -- (acceleration.116) node [midway] {\footnotesize pos1};
-%             \path[draw, ->] (manager.305) -- (acceleration.64) node [midway] {\footnotesize pos2};
-%
-%             \path[draw, ->] (acceleration.250) -- (force.110) node [midway, left] {\footnotesize distance};
-%             \path[draw, ->] (force.70) -- (acceleration.290) node [midway, right] {\footnotesize force};
-%
-%             \path[draw, ->] (acceleration.180) -| (-2, -3) |- (testsim.180) node [near start] {\footnotesize acceleration};
-%
-%         \end{tikzpicture}
-%     }
-%     \caption{Acceleration module 1.2}
-% \end{figure}
+
+\begin{figure}
+    \centering
+    \scalebox{0.7}{
+        \begin{tikzpicture}
+            \node[ram] (posram1) at (5,2) {Position RAM 1};
+            \node[ram] (posram2) at (5,-1) {Position RAM 2};
+            \node[process] (manager) at (0,.5) {Manager};
+            \node[simulation] (testsim) at (0,4) {Testing Simulator};
+            \node[module] (acceleration) at (0,-3) {Acceleration};
+            \node[module] (force) at (0,-6.5) {Force};
+
+            \path[draw, ->] (testsim.350) -| (posram1.90) node [near end] {\footnotesize pos};
+            \path[draw, ->] (testsim.10) -| (7.5,-1) |- (posram2.0) node [near end] {\footnotesize pos};
+
+            \path[draw, ->] (manager.30) -| (2.5,2) |- (posram1.170) node [near end] {\footnotesize i};
+            \path[draw, ->] (manager.330) -| (2.5,0) |- (posram2.190) node [below,near end] {\footnotesize j};
+
+            \path[draw, ->, red] (posram1.190) -| (3,1.5) |- (manager.10) node [near start] {\footnotesize pos1};
+            \path[draw, ->, red] (posram2.170) -| (3,0) |- (manager.350) node [right,pos=0] {\footnotesize pos2};
+
+            \path[draw, ->] (testsim.270) -- (manager.90) node [midway] {\footnotesize ready};
+
+            \path[draw, ->] (manager.235) -- (acceleration.116) node [midway] {\footnotesize pos1};
+            \path[draw, ->] (manager.305) -- (acceleration.64) node [midway] {\footnotesize pos2};
+
+            \path[draw, ->] (acceleration.250) -- (force.110) node [midway, left] {\footnotesize distance};
+            \path[draw, ->] (force.70) -- (acceleration.290) node [midway, right] {\footnotesize force};
+
+            \path[draw, ->] (acceleration.180) -| (-2, -3) |- (testsim.180) node [near start] {\footnotesize acceleration};
+
+        \end{tikzpicture}
+    }
+    \caption{Acceleration module 1.1}
+\end{figure}
+
+% -------------------------------------------------
+% Acceleration 1.2
+
+\begin{figure}
+    \centering
+    \scalebox{0.7}{
+        \begin{tikzpicture}
+            \node[ram] (posram) at (6.5,1) {Position RAM};
+            \node[multiplexer] (mux) at (3.5,1) {};
+            \node[process] (manager) at (0,-.5) {Manager};
+            \node[simulation] (testsim) at (0,3) {Testing Simulator};
+            \node[module] (acceleration) at (0,-3.5) {Acceleration};
+            \node[module] (force) at (0,-6.5) {Force};
+
+            \path[draw, ->] (testsim.0) -| (2,3) |- (mux.north west) node [near end] {\footnotesize (1.) pos};
+            \path[draw, ->] (manager.30) -| (2,0) |- (mux.south west) node [near end] {\footnotesize (2.) i};
+
+            \path[draw, ->] (manager.10) -| (4.5,0) |- (posram.195) node [near end, below] {\footnotesize j};
+
+            \path[draw, ->, red] (posram.250) |-  (manager.350) node [near start, left] {\footnotesize pos1};
+            \path[draw, ->, red] (posram.290) |-  (manager.330) node [near start] {\footnotesize pos2};
+
+            \path[draw, ->] (mux.top side) -- (posram.180) node [midway] {\footnotesize i/pos};
+
+
+            \path[draw, ->] (testsim.270) -- (manager.90) node [midway] {\footnotesize ready};
+
+            \path[draw, ->] (manager.235) -- (acceleration.116) node [midway] {\footnotesize pos1};
+            \path[draw, ->] (manager.305) -- (acceleration.64) node [midway] {\footnotesize pos2};
+
+            \path[draw, ->] (acceleration.250) -- (force.110) node [midway, left] {\footnotesize distance};
+            \path[draw, ->] (force.70) -- (acceleration.290) node [midway, right] {\footnotesize force};
+
+            \path[draw, ->] (acceleration.180) -| (-2, -3) |- (testsim.180) node [near start] {\footnotesize acceleration};
+
+        \end{tikzpicture}
+    }
+    \caption{Acceleration module 1.2}
+\end{figure}
 
 % -------------------------------------------------
 % Cache 1.1
 
-% \begin{figure}
-%     \centering
-%     \scalebox{0.8}{
-%         \begin{tikzpicture}
-%             \node[ram] (accram) at (4.5,-1.5) {Acceleration RAM};
-%             \node[simulation] (testsim) at (0,0) {Testing Simulator};
-%             \node[process] (cache) at (0,-3) {Cache};
-%
-%             \path[draw, ->] (testsim.250) -- (cache.108) node [near end, left] {\footnotesize acceleration};
-%             \path[draw, ->] (testsim.282) -- (cache.80) node [near end] {\footnotesize ready};
-%             \path[draw, ->] (cache.10) -| node [near start] {\footnotesize data array/i} (accram.260) node [near end] {\footnotesize \texttt{A}};
-%             \path[draw, ->, red] (accram.280) |- node [pos=0.2] {\footnotesize \texttt{A}} (cache.350) node [near end] {\footnotesize data array};
-%             \path[draw, ->] (testsim.5) -| node [near start] {\footnotesize i} (accram.80) node [near end] {\footnotesize \texttt{B}};
-%             \path[draw, ->, red] (accram.100) |- node [pos=0.32] {\footnotesize \texttt{B}} (testsim.355) node [near end] {\footnotesize data};
-%
-%             \path[draw, ->] (cache.180) -| (-2.5,-3) |- (testsim.180) node [midway] {\footnotesize finished};
-%
-%         \end{tikzpicture}
-%     }
-%     \caption{Cache module 1.1}
-% \end{figure}
+\begin{figure}
+    \centering
+    \scalebox{0.8}{
+        \begin{tikzpicture}
+            \node[ram] (accram) at (4.5,-1.5) {Acceleration RAM};
+            \node[simulation] (testsim) at (0,0) {Testing Simulator};
+            \node[process] (cache) at (0,-3) {Cache};
+
+            \path[draw, ->] (testsim.250) -- (cache.108) node [near end, left] {\footnotesize acceleration};
+            \path[draw, ->] (testsim.282) -- (cache.80) node [near end] {\footnotesize ready};
+            \path[draw, ->] (cache.10) -| node [near start] {\footnotesize data array/i} (accram.260) node [near end] {\footnotesize \texttt{A}};
+            \path[draw, ->, red] (accram.280) |- node [pos=0.2] {\footnotesize \texttt{A}} (cache.350) node [near end] {\footnotesize data array};
+            \path[draw, ->] (testsim.5) -| node [near start] {\footnotesize i} (accram.80) node [near end] {\footnotesize \texttt{B}};
+            \path[draw, ->, red] (accram.100) |- node [pos=0.32] {\footnotesize \texttt{B}} (testsim.355) node [near end] {\footnotesize data};
+
+            \path[draw, ->] (cache.180) -| (-2.5,-3) |- (testsim.180) node [midway] {\footnotesize finished};
+
+        \end{tikzpicture}
+    }
+    \caption{Cache module 1.1}
+\end{figure}
 
 % -------------------------------------------------
 % Cache 1.1
@@ -161,30 +161,30 @@
     \scalebox{0.8}{
         \begin{tikzpicture}
             \node[ram] (accram) at (-5,-2) {Acceleration RAM};
-            \node[ram] (veloram) at (5.5,-2) {Velocity RAM};
+            \node[ram] (veloram) at (6,-2) {Velocity RAM};
             \node[simulation] (testsim) at (0,0) {Testing Simulator};
             \node[process] (manager) at (0,-4) {Velocity Manager};
             \node[module] (velocity) at (0,-6.5) {Velocity};
-            \node[multiplexer, shape border rotate=270] (mux) at (3.3,-2) {};
+            \node[multiplexer, shape border rotate=270] (mux) at (3.5,-2) {};
 
-            \path[draw, ->] (testsim.250) -- (manager.108) node [near end, left] {\footnotesize simulation ready};
-            \path[draw, ->] (testsim.282) -- (manager.80) node [near end] {\footnotesize data ready};
-            \path[draw, ->] (velocity.128) -- (manager.222) node [midway] {\footnotesize $V_i$};
-            \path[draw, ->] (manager.269) -- (velocity.90) node [midway, left] {\footnotesize $A_i$};
-            \path[draw, ->] (manager.297) -- (velocity.70) node [midway] {\footnotesize $V_{i-1}$};
+            \path[draw, ->] (testsim.250) -- (manager.108) node [near start, left] {\footnotesize acc ready};
+            \path[draw, ->] (testsim.282) -- (manager.80) node [near start] {\footnotesize sim ready};
+            \path[draw, ->] (velocity.128) -- (manager.222) node [midway] {\footnotesize $V_{curr}$};
+            \path[draw, ->] (manager.300) -- (velocity.68) node [midway, left] {\footnotesize $A_{curr}$};
+            \path[draw, ->] (manager.315) -- (velocity.55) node [midway] {\footnotesize $V_{prev}$};
 
             \path[draw, ->] (manager.350) -| node [near start] {\footnotesize i} (veloram.260) node [very near end] {\footnotesize \texttt{A}};
-            \path[draw, ->, red] (veloram.280) |- node [pos=0.11] {\footnotesize \texttt{A}} (manager.340) node [near end] {\footnotesize $V_{i-1}$};
+            \path[draw, ->, red] (veloram.280) |- node [pos=0.11] {\footnotesize \texttt{A}} (manager.340) node [near end] {\footnotesize $V_{prev}$};
 
             \path[draw, ->] (manager.180) -| node [near start, above] {\footnotesize i} (accram.280) node [very near end, right] {\footnotesize \texttt{B}};
-            \path[draw, ->, red] (accram.260) |- node [pos=0.11, left] {\footnotesize \texttt{B}} (manager.190) node [near end, below] {\footnotesize $A_i$};
-            \path[draw, ->] (manager.0) -| (2,-3) |- (mux.south west) node [near end, below] {\footnotesize (2.) $V_i$};
-            \path[draw, ->] (testsim.0) -| (2,-1) |- (mux.north west) node [midway, below] {\footnotesize (1.) $V_{init}$/i};
+            \path[draw, ->, red] (accram.260) |- node [pos=0.11, left] {\footnotesize \texttt{B}} (manager.190) node [near end, below] {\footnotesize $A_{curr}$};
+            \path[draw, ->] (manager.0) -| (1.7,-3) |- (mux.south west) node [near end, below] {\footnotesize (2.) $V_{curr}$};
+            \path[draw, ->] (testsim.0) -| (1.7,-1) |- (mux.north west) node [pos=0.7, below] {\footnotesize (1.) $V_{init}$/i};
 
             \path[draw, ->] (mux.east) -- (veloram.180) node [near end] {\footnotesize \texttt{B}};
             \path[draw, ->] (testsim.100) |- (-5, 1) node [near end, above] {\footnotesize $A_{init}$} -| (accram.90) node [very near end] {\footnotesize \texttt{A}};
 
-              \path[draw, ->, red] (veloram.90) |- node [pos=0.11] {\footnotesize \texttt{B}} (testsim.10) node [near end] {\footnotesize $V_{i}$};
+              \path[draw, ->, red] (veloram.90) |- node [pos=0.11] {\footnotesize \texttt{B}} (testsim.10) node [near end] {\footnotesize $V_{curr}$};
 
             \path[draw, ->] (manager.165) -| (-2.7,-3) |- (testsim.180) node [midway] {\footnotesize finished};
 
@@ -228,7 +228,7 @@
 
             \path[draw, ->, red] (posram.0) -| node [very near start] {\footnotesize \texttt{A}} (2.7,-5) |- (exsim.0) node [near end] {\footnotesize pos};
 
-            \path[draw, ->, red] (2.7,-0) |- (2.7,1) -| (posmanager.50) node [very near end] {\footnotesize $P_{i-1}$};
+            \path[draw, ->, red] (2.7,-0) |- (2.7,1) -| (posmanager.50) node [very near end] {\footnotesize $P_{prev}$};
             \path[draw, ->, red] (2.7,-1.5) -- (accmanager.189) node [midway] {\footnotesize pos1};
 
             \path[draw, ->, red] (posram.345) -| node [pos=0.06, below] {\footnotesize \texttt{B}} (accmanager.210) node [very near end, left] {\footnotesize pos2};
@@ -252,19 +252,19 @@
             \path[draw, ->] (acceleration.20) -- (force.157) node [midway] {\footnotesize distance};
             \path[draw, ->] (force.204) -- (acceleration.340) node [midway] {\footnotesize force};
 
-            \path[draw, ->, red] (accram.250) |- node [very near start, left] {\footnotesize \texttt{B}} (velmanager.0) node [very near end, above] {\footnotesize $A_i$};
+            \path[draw, ->, red] (accram.250) |- node [very near start, left] {\footnotesize \texttt{B}} (velmanager.0) node [very near end, above] {\footnotesize $A_{curr}$};
             \path[draw, ->] (velmanager.345) -| node [very near start, below] {\footnotesize i} (accram.300) node [very near end, right] {\footnotesize \texttt{B}};
 
             \path[draw, ->] (cache.0) -| (10, -5) |- node [near end] {\footnotesize ready signal for each finished cache line} (2,-12) -| (velmanager.330);
 
-            \path[draw, ->] (velmanager.280) -- (velocity.82) node [near end, left] {\footnotesize $A_i$};
-            \path[draw, ->] (velmanager.300) -- (velocity.67) node [near end] {\footnotesize $V_{i-1}$};
-            \path[draw, ->] (velocity.120) -- (velmanager.230) node [midway] {\footnotesize $V_i$};
+            \path[draw, ->] (velmanager.300) -- (velocity.68) node [near end, left] {\footnotesize $A_{curr}$};
+            \path[draw, ->] (velmanager.315) -- (velocity.55) node [near end] {\footnotesize $V_{prev}$};
+            \path[draw, ->] (velocity.128) -- (velmanager.222) node [midway] {\footnotesize $V_{curr}$};
 
 
             \path[draw, ->] (mux4.west) -- (veloram.0) node [midway] {\footnotesize \texttt{A}};
 
-            \path[draw, ->] (velmanager.20) -| (2.7,-10) |- node [midway, right] {\footnotesize (2.) $V_i$} (mux4.south east);
+            \path[draw, ->] (velmanager.20) -| (2.7,-10) |- node [midway, right] {\footnotesize (2.) $V_{curr}$} (mux4.south east);
             \path[draw, ->] (exsim.190) -| (-2.2,-8) -| (2.7,-8) |- node [midway, right] {\footnotesize (1.) $V_{init}$} (mux4.north east);
 
             \path[draw, ->] (mux5.east) -- (veloram.180) node [midway] {\footnotesize \texttt{B}};
@@ -272,22 +272,22 @@
             \path[draw, ->] (velmanager.150) |- (-3,-10) |- node [midway, left] {\footnotesize (1.) i} (mux5.south west);
             \path[draw, ->] (posmanager.300) |- node [very near end] {\footnotesize (2.) i} (mux5.north west);
 
-            \path[draw, ->, red] (veloram.110) |- node [very near start] {\footnotesize \texttt{B}} (-3, -7.5) -| (-4,-8) |- (velmanager.165) node [near end] {\footnotesize $V_{i-1}$};
+            \path[draw, ->, red] (veloram.110) |- node [very near start] {\footnotesize \texttt{B}} (-3, -7.5) -| (-4,-8) |- (velmanager.165) node [near end] {\footnotesize $V_{prev}$};
 
-            \path[draw, ->, red] (-4,-8) -| (posmanager.320) node [near end, right] {\footnotesize $V_i$};
+            \path[draw, ->, red] (-4,-8) -| (posmanager.320) node [near end, right] {\footnotesize $V_{curr}$};
 
             \path[draw, ->] (exsim.180) -| (-4.5,-11) |- (velmanager.180) node [near end, below] {\footnotesize reset};
 
-            \path[draw, ->] (posmanager.165) -- (position.24) node [near end, above] {\footnotesize $P_{i-1}$};
-            \path[draw, ->] (posmanager.175) -- (position.9) node [near end] {\footnotesize $V_i$};
-            \path[draw, ->] (position.335) -- (posmanager.196) node [near end, below] {\footnotesize $P_i$};
+            \path[draw, ->] (posmanager.165) -- (position.24) node [pos=0.7, above] {\footnotesize $P_{prev}$};
+            \path[draw, ->] (posmanager.175) -- (position.9) node [pos=0.7] {\footnotesize $V_{curr}$};
+            \path[draw, ->] (position.335) -- (posmanager.196) node [near end, below] {\footnotesize $P_{curr}$};
 
             \path[draw, ->] (velmanager.195) -| (posmanager.260) node [midway] {\footnotesize ready};
 
 
             \path[draw, ->] (mux3.north) -- (posram.270) node [midway] {\footnotesize \texttt{B}};
 
-            \path[draw, ->] (posmanager.350) -| (-4,-6.5) |- (-4,-7.2) -| (mux3.south west) node [near end, left] {\footnotesize (2.) $P_i$};
+            \path[draw, ->] (posmanager.350) -| (-4,-6.5) |- (-4,-7.2) -| (mux3.south west) node [near end, left] {\footnotesize (2.) $P_{curr}$};
 
             \path[draw, ->] (posmanager.70) |- (-4,-2.5) -| (mux2.north west) node [near end, left] {\footnotesize (2.) i};
 
