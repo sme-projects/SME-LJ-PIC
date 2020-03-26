@@ -41,8 +41,8 @@ namespace Velocity_Update
                 velocity_manager.acceleration_data_point_ramctrl = acceleration_ram.ControlB;
                 velocity_manager.acceleration_data_point_ramresult = acceleration_ram.ReadResultB;
 
-                velocity_manager.updated_velocity_ramctrl = multiplexer.first_input;
-                testing_simulator.velocity_ramctrl = multiplexer.second_input;
+                velocity_manager.updated_velocity_ramctrl = multiplexer.second_input;
+                testing_simulator.velocity_ramctrl = multiplexer.first_input;
                 multiplexer.output = velocity_ram.ControlB;
                 
                 testing_simulator.acceleration_ramctrl = acceleration_ram.ControlA;
