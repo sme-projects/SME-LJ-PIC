@@ -120,7 +120,16 @@ namespace Velocity_Update{
             sim_ready.valid = true;
             await ClockAsync();
             sim_ready.valid = false;
-            data_ready.valid = true;
+
+            // Simulate the wait from the cache
+            for(int i = 0; i < Math.Abs(data_size/cache_size); i++){
+                int random_wait = rnd.Next(5,50);
+                for(int j = 0; j < random_wait;j++){
+                    await ClockAsync();
+                    data_ready.valid = false;
+                }
+                data_ready.valid = true;
+            }
             await ClockAsync();
             data_ready.valid = false;
 
