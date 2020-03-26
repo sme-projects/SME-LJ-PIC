@@ -28,7 +28,7 @@ namespace Position_Update{
         [OutputBus]
         public TrueDualPortMemory<uint>.IControlB data_point_ramctrl;
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlB velocity_data_point_ramctrl;
+        public TrueDualPortMemory<uint>.IControlA velocity_data_point_ramctrl;
 
        
 

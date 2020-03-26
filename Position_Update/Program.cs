@@ -37,14 +37,14 @@ namespace Position_Update
                 position_manager.data_point_ramctrl = position_ram.ControlA;
                 position_manager.data_point_ramresult = position_ram.ReadResultA;
 
-                position_manager.velocity_data_point_ramctrl = velocity_ram.ControlA;
-                position_manager.velocity_data_point_ramresult = velocity_ram.ReadResultA;
+                position_manager.velocity_data_point_ramctrl = velocity_ram.ControlB;
+                position_manager.velocity_data_point_ramresult = velocity_ram.ReadResultB;
 
-                position_manager.updated_data_point_ramctrl = multiplexer.first_input;
-                testing_simulator.data_point_ramctrl = multiplexer.second_input;
+                position_manager.updated_data_point_ramctrl = multiplexer.second_input;
+                testing_simulator.data_point_ramctrl = multiplexer.first_input;
                 multiplexer.output = position_ram.ControlB;
                 
-                testing_simulator.velocity_data_point_ramctrl = velocity_ram.ControlB;
+                testing_simulator.velocity_data_point_ramctrl = velocity_ram.ControlA;
                 testing_simulator.data_point_ramresult = position_ram.ReadResultB;
 
                 sim.Run();

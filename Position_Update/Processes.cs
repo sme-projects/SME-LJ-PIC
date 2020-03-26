@@ -20,7 +20,7 @@ namespace Position_Update
         public ValBus updated_data_point;
 
         [InputBus]
-        public TrueDualPortMemory<uint>.IReadResultA velocity_data_point_ramresult;
+        public TrueDualPortMemory<uint>.IReadResultB velocity_data_point_ramresult;
 
         [InputBus]
         public TrueDualPortMemory<uint>.IReadResultA data_point_ramresult;
@@ -35,7 +35,7 @@ namespace Position_Update
         public FlagBus finished = Scope.CreateBus<FlagBus>();
         
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlA velocity_data_point_ramctrl;
+        public TrueDualPortMemory<uint>.IControlB velocity_data_point_ramctrl;
 
         [OutputBus]
         public TrueDualPortMemory<uint>.IControlA data_point_ramctrl;
