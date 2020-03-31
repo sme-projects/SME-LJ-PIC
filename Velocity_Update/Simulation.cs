@@ -17,7 +17,7 @@ namespace Velocity_Update{
         public FlagBus finished;
 
         [InputBus]
-        public TrueDualPortMemory<uint>.IReadResultB velocity_ramresult;
+        public TrueDualPortMemory<uint>.IReadResultA velocity_ramresult;
 
         [OutputBus]
         public FlagBus sim_ready = Scope.CreateBus<FlagBus>();
@@ -26,7 +26,7 @@ namespace Velocity_Update{
         public FlagBus data_ready = Scope.CreateBus<FlagBus>();
 
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlB velocity_ramctrl;
+        public TrueDualPortMemory<uint>.IControlA velocity_ramctrl;
 
         [OutputBus]
         public RamCtrlArray acceleration_ramctrl;

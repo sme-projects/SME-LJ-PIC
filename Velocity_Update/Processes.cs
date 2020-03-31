@@ -27,7 +27,7 @@ namespace Velocity_Update
         public RamCtrlUint acceleration_data_point_ramctrl;
 
         [InputBus]
-        public TrueDualPortMemory<uint>.IReadResultA velocity_ramresult;
+        public TrueDualPortMemory<uint>.IReadResultB velocity_ramresult;
 
         [OutputBus]
         public ValBus prev_velocity = Scope.CreateBus<ValBus>();
@@ -39,10 +39,10 @@ namespace Velocity_Update
         public FlagBus finished = Scope.CreateBus<FlagBus>();
         
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlA velocity_ramctrl;
+        public TrueDualPortMemory<uint>.IControlB velocity_ramctrl;
 
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlB updated_velocity_ramctrl;
+        public TrueDualPortMemory<uint>.IControlA updated_velocity_ramctrl;
 
         uint data_size;
         float delta_timestep;

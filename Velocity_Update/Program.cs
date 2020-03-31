@@ -28,25 +28,25 @@ namespace Velocity_Update
                     new Update_velocity(velocity_manager.prev_velocity, 
                                 velocity_manager.acceleration_data_point,timestep_size);
                 
-                var multiplexer = new Multiplexer_ControlB();
+                var multiplexer = new Multiplexer_ControlA();
 
                 velocity_manager.sim_ready = testing_simulator.sim_ready;
                 velocity_manager.data_ready = testing_simulator.data_ready;
                 velocity_manager.updated_velocity = velocity.updated_data_point;
                 testing_simulator.finished = velocity_manager.finished;
 
-                velocity_manager.velocity_ramctrl = velocity_ram.ControlA;
-                velocity_manager.velocity_ramresult = velocity_ram.ReadResultA;
+                velocity_manager.velocity_ramctrl = velocity_ram.ControlB;
+                velocity_manager.velocity_ramresult = velocity_ram.ReadResultB;
 
                 velocity_manager.acceleration_data_point_ramctrl = acceleration_ram.ControlB;
                 velocity_manager.acceleration_data_point_ramresult = acceleration_ram.ReadResultB;
 
                 velocity_manager.updated_velocity_ramctrl = multiplexer.second_input;
                 testing_simulator.velocity_ramctrl = multiplexer.first_input;
-                multiplexer.output = velocity_ram.ControlB;
+                multiplexer.output = velocity_ram.ControlA;
                 
                 testing_simulator.acceleration_ramctrl = acceleration_ram.ControlA;
-                testing_simulator.velocity_ramresult = velocity_ram.ReadResultB;
+                testing_simulator.velocity_ramresult = velocity_ram.ReadResultA;
 
                 sim.Run();
                 Console.WriteLine("Simulation completed");
