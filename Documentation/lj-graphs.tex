@@ -154,7 +154,7 @@
 \end{figure}
 
 % -------------------------------------------------
-% Cache 1.1
+% Velocity-(/position-)update module 1.1
 
 \begin{figure}
     \centering
@@ -173,18 +173,18 @@
             \path[draw, ->] (manager.300) -- (velocity.68) node [midway, left] {\footnotesize $A_{curr}$};
             \path[draw, ->] (manager.315) -- (velocity.55) node [midway] {\footnotesize $V_{prev}$};
 
-            \path[draw, ->] (manager.350) -| node [near start] {\footnotesize i} (veloram.260) node [very near end] {\footnotesize \texttt{A}};
-            \path[draw, ->, red] (veloram.280) |- node [pos=0.11] {\footnotesize \texttt{A}} (manager.340) node [near end] {\footnotesize $V_{prev}$};
+            \path[draw, ->] (manager.350) -| node [near start] {\footnotesize i} (veloram.260) node [very near end] {\footnotesize \texttt{B}};
+            \path[draw, ->, red] (veloram.280) |- node [pos=0.11] {\footnotesize \texttt{B}} (manager.340) node [near end] {\footnotesize $V_{prev}$};
 
             \path[draw, ->] (manager.180) -| node [near start, above] {\footnotesize i} (accram.280) node [very near end, right] {\footnotesize \texttt{B}};
             \path[draw, ->, red] (accram.260) |- node [pos=0.11, left] {\footnotesize \texttt{B}} (manager.190) node [near end, below] {\footnotesize $A_{curr}$};
             \path[draw, ->] (manager.0) -| (1.7,-3) |- (mux.south west) node [near end, below] {\footnotesize (2.) $V_{curr}$};
             \path[draw, ->] (testsim.0) -| (1.7,-1) |- (mux.north west) node [pos=0.7, below] {\footnotesize (1.) $V_{init}$/i};
 
-            \path[draw, ->] (mux.east) -- (veloram.180) node [near end] {\footnotesize \texttt{B}};
+            \path[draw, ->] (mux.east) -- (veloram.180) node [near end] {\footnotesize \texttt{A}};
             \path[draw, ->] (testsim.100) |- (-5, 1) node [near end, above] {\footnotesize $A_{init}$} -| (accram.90) node [very near end] {\footnotesize \texttt{A}};
 
-              \path[draw, ->, red] (veloram.90) |- node [pos=0.11] {\footnotesize \texttt{B}} (testsim.10) node [near end] {\footnotesize $V_{curr}$};
+              \path[draw, ->, red] (veloram.90) |- node [pos=0.11] {\footnotesize \texttt{A}} (testsim.10) node [near end] {\footnotesize $V_{curr}$};
 
             \path[draw, ->] (manager.165) -| (-2.7,-3) |- (testsim.180) node [midway] {\footnotesize finished};
 
