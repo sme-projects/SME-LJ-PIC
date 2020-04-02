@@ -11,22 +11,22 @@ namespace Position_Update
     {
 
         [InputBus]
-        public FlagBus sim_ready;
+        public FlagBus reset;
 
         [InputBus]
         public FlagBus data_ready;
 
         [InputBus]
-        public ValBus updated_data_point;
+        public ValBus updated_position;
 
         [InputBus]
         public TrueDualPortMemory<uint>.IReadResultB velocity_data_point_ramresult;
 
         [InputBus]
-        public TrueDualPortMemory<uint>.IReadResultA data_point_ramresult;
+        public TrueDualPortMemory<uint>.IReadResultA position_ramresult;
 
         [OutputBus]
-        public ValBus prev_data_point = Scope.CreateBus<ValBus>();
+        public ValBus prev_position = Scope.CreateBus<ValBus>();
         
         [OutputBus]
         public ValBus velocity_data_point = Scope.CreateBus<ValBus>();
@@ -38,10 +38,10 @@ namespace Position_Update
         public TrueDualPortMemory<uint>.IControlB velocity_data_point_ramctrl;
 
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlA data_point_ramctrl;
+        public TrueDualPortMemory<uint>.IControlA position_ramctrl;
 
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlB updated_data_point_ramctrl;
+        public TrueDualPortMemory<uint>.IControlB updated_position_ramctrl;
 
         uint data_size;
         float delta_timestep;
@@ -57,11 +57,11 @@ namespace Position_Update
 
         protected override void OnTick() {
             // Reset index and result_index before a new simulation loop
-            if(sim_ready.valid){
+            if(reset.valid){
                 index = 0;
                 result_index = 0;
                 velocity_data_point_ramctrl.Enabled = false;
-                data_point_ramctrl.Enabled = false;
+                position_ramctrl.Enabled = false;
             }
             if(data_ready.valid){
                 running = true;
@@ -72,35 +72,35 @@ namespace Position_Update
                 velocity_data_point_ramctrl.Data = 0;
                 velocity_data_point_ramctrl.IsWriting = false;
 
-                data_point_ramctrl.Enabled = index < data_size;
-                data_point_ramctrl.Address = index;
-                data_point_ramctrl.Data = 0;
-                data_point_ramctrl.IsWriting = false;
+                position_ramctrl.Enabled = index < data_size;
+                position_ramctrl.Address = index;
+                position_ramctrl.Data = 0;
+                position_ramctrl.IsWriting = false;
 
                 if(index >= 2 && index <= data_size + 1){
                     velocity_data_point.val = velocity_data_point_ramresult.Data;
-                    prev_data_point.val = data_point_ramresult.Data;
+                    prev_position.val = position_ramresult.Data;
                     velocity_data_point.valid = true;
-                    prev_data_point.valid = true;
+                    prev_position.valid = true;
                 }else{
                     velocity_data_point.valid = false;
-                    prev_data_point.valid = false;
+                    prev_position.valid = false;
                 }
                 if(result_index >= data_size){
                     finished.valid = true;
                     running = false;
                 }
-                if(updated_data_point.valid){
-                    updated_data_point_ramctrl.Enabled = result_index < data_size;
-                    updated_data_point_ramctrl.Address = result_index;
-                    updated_data_point_ramctrl.Data = updated_data_point.val;
-                    updated_data_point_ramctrl.IsWriting = true;
+                if(updated_position.valid){
+                    updated_position_ramctrl.Enabled = result_index < data_size;
+                    updated_position_ramctrl.Address = result_index;
+                    updated_position_ramctrl.Data = updated_position.val;
+                    updated_position_ramctrl.IsWriting = true;
                     result_index++;
                 }else{
-                    updated_data_point_ramctrl.Enabled = false;
-                    updated_data_point_ramctrl.Address = 0;
-                    updated_data_point_ramctrl.Data = 0;
-                    updated_data_point_ramctrl.IsWriting = false;
+                    updated_position_ramctrl.Enabled = false;
+                    updated_position_ramctrl.Address = 0;
+                    updated_position_ramctrl.Data = 0;
+                    updated_position_ramctrl.IsWriting = false;
                 }
                 index++;
             }

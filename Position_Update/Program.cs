@@ -24,23 +24,23 @@ namespace Position_Update
                 
 
                 Update_position update_position = 
-                    new Update_position(position_manager.prev_data_point, 
+                    new Update_position(position_manager.prev_position, 
                                 position_manager.velocity_data_point,timestep_size);
                 
                 var multiplexer = new Multiplexer_ControlB();
 
-                position_manager.sim_ready = testing_simulator.sim_ready;
+                position_manager.reset = testing_simulator.sim_ready;
                 position_manager.data_ready = testing_simulator.data_ready;
-                position_manager.updated_data_point = update_position.updated_data_point;
+                position_manager.updated_position = update_position.updated_data_point;
                 testing_simulator.finished = position_manager.finished;
 
-                position_manager.data_point_ramctrl = position_ram.ControlA;
-                position_manager.data_point_ramresult = position_ram.ReadResultA;
+                position_manager.position_ramctrl = position_ram.ControlA;
+                position_manager.position_ramresult = position_ram.ReadResultA;
 
                 position_manager.velocity_data_point_ramctrl = velocity_ram.ControlB;
                 position_manager.velocity_data_point_ramresult = velocity_ram.ReadResultB;
 
-                position_manager.updated_data_point_ramctrl = multiplexer.second_input;
+                position_manager.updated_position_ramctrl = multiplexer.second_input;
                 testing_simulator.data_point_ramctrl = multiplexer.first_input;
                 multiplexer.output = position_ram.ControlB;
                 
