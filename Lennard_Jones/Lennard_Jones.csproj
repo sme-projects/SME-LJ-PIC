@@ -18,6 +18,7 @@
     <ProjectReference Include="../Deflib/Deflib.csproj" />
     <ProjectReference Include="../Acceleration/Acceleration.csproj" />
     <ProjectReference Include="../Velocity_Update/Velocity_Update.csproj" />
+    <ProjectReference Include="../Position_Update/Position_Update.csproj" />
   </ItemGroup>
 
 </Project>
