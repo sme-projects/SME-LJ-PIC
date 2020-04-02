@@ -47,8 +47,8 @@ namespace Velocity_Update
         uint data_size;
         float delta_timestep;
 
-        uint index = 0;
-        uint ram_return_index = 0;
+        int index = 0;
+        int ram_return_index = 0;
         int result_index = 0;
         bool running = false;
         uint ready_to_read = 0;
@@ -82,7 +82,7 @@ namespace Velocity_Update
 
 
                 // Get data from ram and send it to velocity calculation
-                if(index - ram_return_index >= 2 || index >= data_size){
+                if(index - ram_return_index >= 2 || (index >= data_size && ram_return_index < data_size)){
                     acceleration_data_point.val = acceleration_data_point_ramresult.Data;
                     prev_velocity.val = velocity_ramresult.Data;
                     acceleration_data_point.valid = true;
@@ -95,7 +95,7 @@ namespace Velocity_Update
 
                 // Update velocity and acceleration ram addresses
                 if(index < ready_to_read){
-                    acceleration_data_point_ramctrl.Address = index;
+                    acceleration_data_point_ramctrl.Address = (uint)index;
                     velocity_ramctrl.Address = (int)index;
                     index++;
                 } else {
