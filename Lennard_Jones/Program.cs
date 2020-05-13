@@ -97,7 +97,7 @@ namespace Lennard_Jones
 
                 position_manager.velocity_data_point_ramresult = velocity_ram.ReadResultB;
 
-                velocity_manager.sim_ready = external_simulator.velocity_reset; 
+                velocity_manager.reset = external_simulator.velocity_reset; 
                 position_manager.data_ready = velocity_manager.finished;
 
                 position_manager.reset = external_simulator.position_reset;
@@ -107,7 +107,6 @@ namespace Lennard_Jones
 
                 external_simulator.finished = position_manager.finished;
 
-                // sim.Run(null, () => true);
                 sim.Run();
                 Console.WriteLine("Simulation completed");
             }

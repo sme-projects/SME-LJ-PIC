@@ -12,7 +12,7 @@ namespace Velocity_Update
     {
 
         [InputBus]
-        public FlagBus sim_ready;
+        public FlagBus reset;
 
         [InputBus]
         public FlagBus data_ready;
@@ -47,11 +47,11 @@ namespace Velocity_Update
         uint data_size;
         float delta_timestep;
 
-        int index = 0;
-        int ram_return_index = 0;
-        int result_index = 0;
+        int index;
+        int ram_return_index;
+        int result_index;
         bool running = false;
-        uint ready_to_read = 0;
+        uint ready_to_read;
 
         public Manager(uint size, float timestep){
             data_size = size;
@@ -60,12 +60,15 @@ namespace Velocity_Update
 
         protected override void OnTick() {
             // Reset index and result_index before a new simulation loop
-            if(sim_ready.valid){
+            finished.valid = false;
+            if(reset.valid){
                 index = 0;
                 result_index = 0;
+                ready_to_read = 0;
+                ram_return_index = 0;
                 acceleration_data_point_ramctrl.Enabled = false;
                 velocity_ramctrl.Enabled = false;
-                finished.valid = false;
+
             }
             if(data_ready.valid){
                 running = true;

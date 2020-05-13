@@ -30,7 +30,7 @@ namespace Velocity_Update
                 
                 var multiplexer = new Multiplexer_ControlA();
 
-                velocity_manager.sim_ready = testing_simulator.sim_ready;
+                velocity_manager.reset = testing_simulator.sim_ready;
                 velocity_manager.data_ready = testing_simulator.data_ready;
                 velocity_manager.updated_velocity = velocity.updated_data_point;
                 testing_simulator.finished = velocity_manager.finished;

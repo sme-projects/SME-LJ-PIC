@@ -57,6 +57,7 @@ namespace Position_Update
 
         protected override void OnTick() {
             // Reset index and result_index before a new simulation loop
+            finished.valid = false;
             if(reset.valid){
                 index = 0;
                 result_index = 0;
