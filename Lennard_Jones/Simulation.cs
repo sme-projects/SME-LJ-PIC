@@ -50,11 +50,14 @@ namespace Lennard_Jones
             // Initial await
             await ClockAsync();
 
+            // Funcs.Tester();
+
             Random rnd = new Random();
             // Testing data
             // Positions array is kept float so that the uint bitstream can be
             // generated correctly
             float[] positions = new float[data_size];
+            
             for(uint i = 0; i < data_size; i++){
                 // int random_number = rnd.Next(10,1000);
                 // float float_rnd_number = random_number;
@@ -63,8 +66,13 @@ namespace Lennard_Jones
                 // else
                 //     i--;
                 // Non-random data:
-                positions[i] = (float) i + 1;
+                positions[i] = (float) i * 4;
                 // Console.WriteLine("position: {0}", positions[i]);
+            }
+
+            float[] velocity = new float[data_size];
+            for(uint i = 0; i < data_size; i++){
+                velocity[i] = 0.0f;
             }
 
             for(int i = 0; i < positions.Length; i++){
@@ -84,75 +92,89 @@ namespace Lennard_Jones
                 await ClockAsync();
             }
 
-            bool running = true;
-            position_ramctrl.Enabled = false;
-            init_velocity_ramctrl.Enabled = false;
-            acc_ready.val = data_size;
-            acc_ready.valid = true;
-            velocity_reset.valid = true;
-            position_reset.valid = true;
-            await ClockAsync();
-            acc_ready.valid = false;
-            velocity_reset.valid = false;
-            position_reset.valid = false;
+            // LJ loop
+            for(int k = 0; k < (uint)Number_of_loops.n; k++){
 
-
-            // Calculating data for verifying results
-            float[] accelerations = new float[positions.Length];
-            for(int i = 0; i < positions.Length; i++){
-                for(int j = i + 1; j < positions.Length; j++){
-                    float result = Sim_Funcs.Acceleration_Calc(positions[i], positions[j]);
-                    accelerations[i] += result;
-                    accelerations[j] += - result;
-                }
-            }
-
-            float[] updated_velocity = new float[data_size];
-            // Calculate data for tests
-            for( int i = 0; i < data_size; i++){
-                // Initial velocity is 0
-                float update_result = Sim_Funcs.Update_Data_Calc(0.0f, accelerations[i], timestep);
-                updated_velocity[i] = update_result;
-            }
-
-            float[] updated_positions = new float[data_size];
-            // Calculate data for tests
-            for( int i = 0; i < data_size; i++){
-                float update_result = Sim_Funcs.Update_Data_Calc(positions[i], updated_velocity[i], timestep);
-                updated_positions[i] = update_result;
-            }
-
-            int k = 0;
-            int n = 0;
-
-            while(running){
-                if(finished.valid){
-                    
-                    if(k < data_size){
-                        position_ramctrl.Enabled = true;
-                        position_ramctrl.Data = 0;
-                        position_ramctrl.IsWriting = false;
-                        position_ramctrl.Address = k;
-                        k++;
-                    }else{
-                        position_ramctrl.Enabled = false;
-                    }
-
-                    if(k-n > 2 || k >= data_size){
-                        float input_result = Funcs.FromUint(position_ramresult.Data);
-                        if(Math.Abs(updated_positions[n] - input_result) > 0.0f)
-                            Console.WriteLine("Update position result - Got {0}, expected {1} at {2}",
-                                    input_result, updated_positions[n], n);
-                        n++;
-                    }
-                    if(n >= data_size)
-                        running = false;
-                }
+                bool running = true;
+                position_ramctrl.Enabled = false;
+                position_ramctrl.Data = 0;
+                position_ramctrl.IsWriting = false;
+                init_velocity_ramctrl.Enabled = false;
+                init_velocity_ramctrl.Data = 0;
+                init_velocity_ramctrl.IsWriting = false;
+                acc_ready.val = data_size;
+                acc_ready.valid = true;
+                velocity_reset.valid = true;
+                position_reset.valid = true;
                 await ClockAsync();
-                
+                acc_ready.valid = false;
+                velocity_reset.valid = false;
+                position_reset.valid = false;
+
+
+                // Calculating data for verifying results
+                float[] accelerations = new float[positions.Length];
+                for(int i = 0; i < positions.Length; i++){
+                    for(int j = i + 1; j < positions.Length; j++){
+                        float result = Sim_Funcs.Acceleration_Calc(positions[i], positions[j]);
+                        accelerations[i] += result;
+                        accelerations[j] += - result;
+                    }
+                }
+
+                float[] updated_velocity = new float[data_size];
+                // Calculate data for tests
+                for( int i = 0; i < data_size; i++){
+                    // Initial velocity is 0
+                    float update_result = Sim_Funcs.Update_Data_Calc(velocity[i], accelerations[i], timestep);
+                    updated_velocity[i] = update_result;
+                }
+
+                float[] updated_positions = new float[data_size];
+                // Calculate data for tests
+                for( int i = 0; i < data_size; i++){
+                    float update_result = Sim_Funcs.Update_Data_Calc(positions[i], updated_velocity[i], timestep);
+                    updated_positions[i] = update_result;
+                }
+
+                int m = 0;
+                int n = 0;
+                bool data_ready = false;
+
+                while(running){
+                    if(finished.valid)
+                        data_ready = true;
+                        
+                    if(data_ready){
+                        if(m < data_size){
+                            position_ramctrl.Enabled = true;
+                            position_ramctrl.Data = 0;
+                            position_ramctrl.IsWriting = false;
+                            position_ramctrl.Address = m;
+                            m++;
+                        }else{
+                            position_ramctrl.Enabled = false;
+                        }
+
+                        if(m-n > 2 || m >= data_size){
+                            float input_result = Funcs.FromUint(position_ramresult.Data);
+                            if(Math.Abs(updated_positions[n] - input_result) > 0.00001f)
+                                Console.WriteLine("Update position result - Got {0}, expected {1} at {2}",
+                                        input_result, updated_positions[n], n);
+                            n++;
+                        }
+                        if(n >= data_size){
+                            running = false;
+                            data_ready = false;
+                            positions = updated_positions;
+                            velocity = updated_velocity;
+                        }
+                    }
+                    await ClockAsync();
+                }
+            Console.WriteLine("Loop {0} finished", k);
             }
         }
     }
-    
     
 }
