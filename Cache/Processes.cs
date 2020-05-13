@@ -81,8 +81,6 @@ namespace Cache{
         uint received_data_address;
         bool last_cache_blocks;
         
-        uint count = 0;
-        
         protected override void OnTick() {
             if(ready.valid){
                 
@@ -113,7 +111,8 @@ namespace Cache{
 
                 last_cache_index_i = 0;
                 last_cache_index_j = 0;
-                
+
+                dirty_blocks = 0;
                 
                 /*  NOTE: The Acceleration manager will never write to more than 
                     there are amount of data. Therefore it is only a problem when 
@@ -135,7 +134,6 @@ namespace Cache{
             }
 
             if(acceleration_input.valid && running){
-
                 output.valid = false;
                 
                 // Find current i and j
@@ -500,8 +498,6 @@ namespace Cache{
                 running = false;
             }
             
-            // Console.WriteLine("Clock cycle count is: {0}", count);
-            count++;
         }
     }
 }
