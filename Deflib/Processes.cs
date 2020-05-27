@@ -347,49 +347,49 @@ namespace Deflib {
     [ClockedProcess]
     public class AccelerationDataRam : SimpleProcess
     {
-        public AccelerationDataRam(uint size)
+        public AccelerationDataRam(ulong size)
         {
             mem_size = size;
-            mem = new uint[size];
+            mem = new ulong[size];
         }
 
         [InputBus]
         public RamCtrlArray ControlA = Scope.CreateBus<RamCtrlArray>();
 
         [InputBus]
-        public RamCtrlUint ControlB = Scope.CreateBus<RamCtrlUint>(); 
+        public RamCtrlUlong ControlB = Scope.CreateBus<RamCtrlUlong>(); 
 
         [OutputBus]
         public RamResultArray ReadResultA = 
             Scope.CreateBus<RamResultArray>();
 
         [OutputBus]
-        public RamResultUint ReadResultB = Scope.CreateBus<RamResultUint>();
+        public RamResultUlong ReadResultB = Scope.CreateBus<RamResultUlong>();
        
-        uint mem_size;
-        uint[] mem;
+        ulong mem_size;
+        ulong[] mem;
 
         protected override void OnTick()
         {
             if (ControlB.Enabled)
-                ReadResultB.Data = ControlB.Address < mem_size ? mem[ControlB.Address]: (uint)0xFFFFFFFF;
+                ReadResultB.Data = ControlB.Address < mem_size ? mem[ControlB.Address]: (ulong)0xFFFFFFFF;
             
             if (ControlA.Enabled)
                 for (int i = 0; i < ControlA.Data.Length; i++)
-                    if((ControlA.Address*ControlA.Data.Length + i) < mem_size){
-                        ReadResultA.Data[i] = mem[ControlA.Address*ControlA.Data.Length + i];
+                    if((ulong)((int)ControlA.Address*ControlA.Data.Length + i) < mem_size){
+                        ReadResultA.Data[i] = mem[(int)ControlA.Address*ControlA.Data.Length + i];
                     }else{
                         // Data outside of memory
-                        ReadResultA.Data[i] = (uint)0xFFFFFFFF;
+                        ReadResultA.Data[i] = (ulong)0xFFFFFFFF;
                     }
                 
 
             if (ControlB.Enabled && ControlB.IsWriting)
-                mem[ControlB.Address] = ControlB.Data;
+                mem[ControlB.Address] = (ulong)ControlB.Data;
             
             if (ControlA.Enabled && ControlA.IsWriting)
                 for (int i = 0; i < ControlA.Data.Length; i++)
-                    mem[ControlA.Address*ControlA.Data.Length + i] = ControlA.Data[i];
+                    mem[(int)ControlA.Address*ControlA.Data.Length + i] = (ulong)ControlA.Data[i];
         }
     }
 }
