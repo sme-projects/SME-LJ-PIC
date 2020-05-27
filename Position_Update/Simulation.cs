@@ -117,9 +117,12 @@ namespace Position_Update{
 
             int k = 0;
             int n = 0;
+            bool receive_data_ready = false;
             while(running){
-                if(finished.valid){
-                    
+                if(finished.valid)
+                    receive_data_ready = true;
+                
+                if(receive_data_ready){
                     if(k < random_velocity_data.Length){
                         data_point_ramctrl.Enabled = true;
                         data_point_ramctrl.Data = 0;
@@ -137,8 +140,11 @@ namespace Position_Update{
                                     input_result, updated_data_points[n], n);
                         n++;
                     }
-                    if(n >= random_velocity_data.Length)
+                    if(n >= random_velocity_data.Length){
                         running = false;
+                        receive_data_ready = false;
+                        // TODO: Add looping functionality - see Lennard_Jones.Simulations
+                    }
                 }
                 await ClockAsync();
                 

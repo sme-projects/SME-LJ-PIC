@@ -135,9 +135,12 @@ namespace Velocity_Update{
 
             int k = 0;
             int n = 0;
+            bool receive_data_ready = false;
             while(running){
-                if(finished.valid){
-                    
+                if(finished.valid)
+                    receive_data_ready = true;
+                
+                if(receive_data_ready){
                     if(k < data_size){
                         velocity_ramctrl.Enabled = true;
                         velocity_ramctrl.Data = 0;
@@ -155,8 +158,11 @@ namespace Velocity_Update{
                                     input_result, updated_velocity[n], n);
                         n++;
                     }
-                    if(n >= random_acceleration_data.Length)
+                    if(n >= acceleration_data.Length){
                         running = false;
+                        receive_data_ready = false;
+                        // TODO: Add looping functionality - see Lennard_Jones.Simulations
+                    }
                 }
                 await ClockAsync();
                 
