@@ -8,8 +8,8 @@ namespace Deflib {
 
     
     // Absolute process with floating point
-    // Input: An input (negative or positive) (uint)
-    // Output: The absolute value of the input (uint)
+    // Input: An input (negative or positive) (ulong)
+    // Output: The absolute value of the input (ulong)
     [ClockedProcess]
     public class Abs : SimpleProcess 
     {
@@ -22,9 +22,9 @@ namespace Deflib {
         protected override void OnTick()
         {
             if(input.valid){
-                float float_input = Funcs.FromUint(input.val);
-                float float_output = (float) Math.Abs(float_input);
-                output.val = Funcs.FromFloat(float_output);
+                double double_input = Funcs.FromUlong(input.val);
+                double double_output = (double) Math.Abs(double_input);
+                output.val = Funcs.FromDouble(double_output);
                 output.valid = true;
             } else {
                 output.valid = false;
@@ -33,8 +33,8 @@ namespace Deflib {
     }
 
     // Add process with floating point
-    // Input: A Augend and a Addend (uint)
-    // Output: A sum (uint)
+    // Input: A Augend and a Addend (ulong)
+    // Output: A sum (ulong)
     // Augend + Addend = Sum
     [ClockedProcess]
     public class Add : SimpleProcess 
@@ -52,10 +52,10 @@ namespace Deflib {
         protected override void OnTick()
         {
             if(augend.valid && addend.valid ){
-                float float_augend = Funcs.FromUint(augend.val);
-                float float_addend = Funcs.FromUint(addend.val);
-                float float_sum = float_augend + float_addend;
-                sum.val = Funcs.FromFloat(float_sum);
+                double double_augend = Funcs.FromUlong(augend.val);
+                double double_addend = Funcs.FromUlong(addend.val);
+                double double_sum = double_augend + double_addend;
+                sum.val = Funcs.FromDouble(double_sum);
                 sum.valid = true;
             } else {
                 sum.valid = false;
@@ -65,8 +65,8 @@ namespace Deflib {
 
 
     // Minus process with floating point
-    // Input: A minuend and a subtrahend (uint)
-    // Output: A difference (uint)
+    // Input: A minuend and a subtrahend (ulong)
+    // Output: A difference (ulong)
     // minuend - subtrahend = difference
     [ClockedProcess]
     public class Min : SimpleProcess 
@@ -84,10 +84,10 @@ namespace Deflib {
         protected override void OnTick()
         {
             if(minuend.valid && subtrahend.valid ){
-                float float_minuend = Funcs.FromUint(minuend.val);
-                float float_subtrahend = Funcs.FromUint(subtrahend.val);
-                float float_difference = float_minuend - float_subtrahend;
-                difference.val = Funcs.FromFloat(float_difference);
+                double double_minuend = Funcs.FromUlong(minuend.val);
+                double double_subtrahend = Funcs.FromUlong(subtrahend.val);
+                double double_difference = double_minuend - double_subtrahend;
+                difference.val = Funcs.FromDouble(double_difference);
                 difference.valid = true;
             } else {
                 difference.valid = false;
@@ -96,8 +96,8 @@ namespace Deflib {
     }
 
     // Exponentiel process with floating point
-    // Input: An value (uint)
-    // Output: A result (uint)
+    // Input: An value (ulong)
+    // Output: A result (ulong)
     // e^input = result
     [ClockedProcess]
     public class Exp : SimpleProcess 
@@ -111,9 +111,9 @@ namespace Deflib {
         protected override void OnTick()
         {
             if(input.valid){
-                float float_val = Funcs.FromUint(input.val);
-                float float_result = (float) Math.Exp(float_val);
-                output.val = Funcs.FromFloat(float_result);
+                double double_val = Funcs.FromUlong(input.val);
+                double double_result = (double) Math.Exp(double_val);
+                output.val = Funcs.FromDouble(double_result);
                 output.valid = true;
             } else {
                 output.valid = false;
@@ -122,8 +122,8 @@ namespace Deflib {
     }
 
     // Multiplication process with floating point
-    // Input: A multiplicant and a multiplier (uint)
-    // Output: A product (uint)
+    // Input: A multiplicant and a multiplier (ulong)
+    // Output: A product (ulong)
     // multiplicant * multiplier = product
     [ClockedProcess]
     public class Mul : SimpleProcess 
@@ -140,10 +140,10 @@ namespace Deflib {
         protected override void OnTick()
         {
             if(multiplicant.valid && multiplier.valid){
-                float float_multiplicant = Funcs.FromUint(multiplicant.val);
-                float float_multiplier = Funcs.FromUint(multiplier.val);
-                float float_product = float_multiplicant * float_multiplier;
-                product.val = Funcs.FromFloat(float_product);
+                double double_multiplicant = Funcs.FromUlong(multiplicant.val);
+                double double_multiplier = Funcs.FromUlong(multiplier.val);
+                double double_product = double_multiplicant * double_multiplier;
+                product.val = Funcs.FromDouble(double_product);
                 product.valid = true;
             } else {
                 product.valid = false;
@@ -152,8 +152,8 @@ namespace Deflib {
     }
 
     // Natural logarithm process with floating point
-    // Input: A value (uint)
-    // Output: A result (uint)
+    // Input: A value (ulong)
+    // Output: A result (ulong)
     // ln(input) = output
     [ClockedProcess]
     public class Ln : SimpleProcess 
@@ -167,9 +167,9 @@ namespace Deflib {
         protected override void OnTick()
         {
             if(input.valid){
-                float float_val = Funcs.FromUint(input.val);
-                float float_result = (float) Math.Log(float_val);
-                output.val = Funcs.FromFloat(float_result);
+                double double_val = Funcs.FromUlong(input.val);
+                double double_result = (double) Math.Log(double_val);
+                output.val = Funcs.FromDouble(double_result);
                 output.valid = true;
             } else {
                 output.valid = false;
@@ -181,8 +181,8 @@ namespace Deflib {
     // TODO: Handle div by 0!!
 
     // Division process with floating point
-    // Input: A divident and a divisor (uint)
-    // Output: A quotient (uint)
+    // Input: A divident and a divisor (ulong)
+    // Output: A quotient (ulong)
     // divident / divisor = quotient
     [ClockedProcess]
     public class Div : SimpleProcess 
@@ -199,10 +199,10 @@ namespace Deflib {
         protected override void OnTick()
         {
             if(divident.valid && divisor.valid){
-                float float_divident = Funcs.FromUint(divident.val);
-                float float_divisor = Funcs.FromUint(divisor.val);
-                float float_quotient = float_divident / float_divisor;
-                quotient.val = Funcs.FromFloat(float_quotient);
+                double double_divident = Funcs.FromUlong(divident.val);
+                double double_divisor = Funcs.FromUlong(divisor.val);
+                double double_quotient = double_divident / double_divisor;
+                quotient.val = Funcs.FromDouble(double_quotient);
                 quotient.valid = true;
             } else {
                 quotient.valid = false;
@@ -217,12 +217,12 @@ namespace Deflib {
         [OutputBus]
         public ValBus output = Scope.CreateBus<ValBus>();
 
-        public Constants(float elem)
+        public Constants(double elem)
         {
-            this.val = Funcs.FromFloat(elem);
+            this.val = Funcs.FromDouble(elem);
         }
 
-        private uint val;
+        private ulong val;
 
 
         protected override void OnTick()
@@ -259,12 +259,12 @@ namespace Deflib {
         public PipelineRegister first;
         public PipelineRegister last;
 
-        public nPipe(int n)
+        public nPipe(long n)
         {
             PipelineRegister[] regs = new PipelineRegister[n];
-            for (int i = 0; i < n; i++)
+            for (long i = 0; i < n; i++)
                 regs[i] = new PipelineRegister();
-            for (int i = 1; i < n; i++)
+            for (long i = 1; i < n; i++)
                 regs[i].input = regs[i-1].output;
             first = regs[0];
             last = regs[regs.Length-1];
@@ -275,13 +275,13 @@ namespace Deflib {
     public class Multiplexer_ControlA : SimpleProcess
     {
         [InputBus]
-        public TrueDualPortMemory<uint>.IControlA first_input = Scope.CreateBus<TrueDualPortMemory<uint>.IControlA>();
+        public TrueDualPortMemory<ulong>.IControlA first_input = Scope.CreateBus<TrueDualPortMemory<ulong>.IControlA>();
         
         [InputBus]
-        public TrueDualPortMemory<uint>.IControlA second_input = Scope.CreateBus<TrueDualPortMemory<uint>.IControlA>();
+        public TrueDualPortMemory<ulong>.IControlA second_input = Scope.CreateBus<TrueDualPortMemory<ulong>.IControlA>();
 
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlA output;
+        public TrueDualPortMemory<ulong>.IControlA output;
 
 
         protected override void OnTick()
@@ -309,13 +309,13 @@ namespace Deflib {
     public class Multiplexer_ControlB : SimpleProcess
     {
         [InputBus]
-        public TrueDualPortMemory<uint>.IControlB first_input = Scope.CreateBus<TrueDualPortMemory<uint>.IControlB>();
+        public TrueDualPortMemory<ulong>.IControlB first_input = Scope.CreateBus<TrueDualPortMemory<ulong>.IControlB>();
         
         [InputBus]
-        public TrueDualPortMemory<uint>.IControlB second_input = Scope.CreateBus<TrueDualPortMemory<uint>.IControlB>();
+        public TrueDualPortMemory<ulong>.IControlB second_input = Scope.CreateBus<TrueDualPortMemory<ulong>.IControlB>();
 
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlB output;
+        public TrueDualPortMemory<ulong>.IControlB output;
 
 
         protected override void OnTick()

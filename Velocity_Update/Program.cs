@@ -13,14 +13,14 @@ namespace Velocity_Update
             using(var sim = new Simulation())
             {
                 // TODO: Fix to handle data_size not divisable with cache_size
-                int data_size = 48;
-                float timestep_size = 10.1f;
+                long data_size = 20;
+                double timestep_size = 10.1;
 
-                var velocity_ram = new TrueDualPortMemory<uint>(data_size);
-                var acceleration_ram = new Deflib.AccelerationDataRam((uint)data_size);
+                var velocity_ram = new TrueDualPortMemory<ulong>((int)data_size);
+                var acceleration_ram = new Deflib.AccelerationDataRam((ulong)data_size);
                 
-                var testing_simulator = new Testing_Simulation((uint)data_size, timestep_size, (uint)Cache_size.n);
-                var velocity_manager = new Manager((uint)data_size, timestep_size);
+                var testing_simulator = new Testing_Simulation((ulong)data_size, timestep_size, (ulong)Cache_size.n);
+                var velocity_manager = new Manager((ulong)data_size, timestep_size);
                 
                 
 
@@ -60,7 +60,7 @@ namespace Velocity_Update
         public ValBus acceleration_data_point;
         public ValBus updated_data_point;
 
-        public Update_velocity(ValBus prev_data_point, ValBus acceleration_data_point, float timestep)
+        public Update_velocity(ValBus prev_data_point, ValBus acceleration_data_point, double timestep)
         {
             this.prev_data_point = prev_data_point;
             this.acceleration_data_point = acceleration_data_point;

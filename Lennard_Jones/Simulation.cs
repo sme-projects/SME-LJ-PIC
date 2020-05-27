@@ -15,13 +15,13 @@ namespace Lennard_Jones
         public FlagBus finished;
         
         [InputBus]
-        public TrueDualPortMemory<uint>.IReadResultA position_ramresult;
+        public TrueDualPortMemory<ulong>.IReadResultA position_ramresult;
 
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlA init_velocity_ramctrl;
+        public TrueDualPortMemory<ulong>.IControlA init_velocity_ramctrl;
     
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlA position_ramctrl;
+        public TrueDualPortMemory<ulong>.IControlA position_ramctrl;
 
         [OutputBus]
         public ValBus acc_ready = Scope.CreateBus<ValBus>();
@@ -34,58 +34,57 @@ namespace Lennard_Jones
 
         
 
-        public External_Sim(uint data_size, float timestep_size, uint cache_size)
+        public External_Sim(ulong data_size, double timestep_size, ulong cache_size)
         {
-            this.data_size = data_size;
+            this.data_size = (uint)data_size;
             this.timestep = timestep_size;
             this.cache_size = cache_size;
         }
 
         private uint data_size;
-        private float timestep;
-        private uint cache_size;
+        private double timestep;
+        private ulong cache_size;
 
         public override async System.Threading.Tasks.Task Run() 
         {
             // Initial await
             await ClockAsync();
 
-            // Funcs.Tester();
 
             Random rnd = new Random();
             // Testing data
-            // Positions array is kept float so that the uint bitstream can be
+            // Positions array is kept double so that the ulong bitstream can be
             // generated correctly
-            float[] positions = new float[data_size];
+            double[] positions = new double[data_size];
             
-            for(uint i = 0; i < data_size; i++){
-                // int random_number = rnd.Next(10,1000);
-                // float float_rnd_number = random_number;
-                // if(!positions.Contains((float) random_number))
-                //     positions[i] = (float) random_number;
+            for(ulong i = 0; i < data_size; i++){
+                // long random_number = rnd.Next(10,1000);
+                // double double_rnd_number = random_number;
+                // if(!positions.Contains((double) random_number))
+                //     positions[i] = (double) random_number;
                 // else
                 //     i--;
                 // Non-random data:
-                positions[i] = (float) i * 4;
+                positions[i] = (double) i + 1;
                 // Console.WriteLine("position: {0}", positions[i]);
             }
 
-            float[] velocity = new float[data_size];
-            for(uint i = 0; i < data_size; i++){
-                velocity[i] = 0.0f;
+            double[] velocity = new double[data_size];
+            for(ulong i = 0; i < data_size; i++){
+                velocity[i] = 0.0;
             }
 
             for(int i = 0; i < positions.Length; i++){
                 // Write initial data to position ram
                 position_ramctrl.Address = i;
-                position_ramctrl.Data = Funcs.FromFloat(positions[i]);
+                position_ramctrl.Data = Funcs.FromDouble(positions[i]);
                 position_ramctrl.IsWriting = true;
                 position_ramctrl.Enabled = true;
 
                 // Write initial data to velocity ram
                 init_velocity_ramctrl.Address = i;
                 // Initial value is 0
-                init_velocity_ramctrl.Data = Funcs.FromFloat(0.0f); 
+                init_velocity_ramctrl.Data = Funcs.FromDouble(0.0f); 
                 init_velocity_ramctrl.IsWriting = true;
                 init_velocity_ramctrl.Enabled = true;
 
@@ -113,27 +112,27 @@ namespace Lennard_Jones
 
 
                 // Calculating data for verifying results
-                float[] accelerations = new float[positions.Length];
-                for(int i = 0; i < positions.Length; i++){
-                    for(int j = i + 1; j < positions.Length; j++){
-                        float result = Sim_Funcs.Acceleration_Calc(positions[i], positions[j]);
+                double[] accelerations = new double[positions.Length];
+                for(long i = 0; i < positions.Length; i++){
+                    for(long j = i + 1; j < positions.Length; j++){
+                        double result = Sim_Funcs.Acceleration_Calc(positions[i], positions[j]);
                         accelerations[i] += result;
                         accelerations[j] += - result;
                     }
                 }
 
-                float[] updated_velocity = new float[data_size];
+                double[] updated_velocity = new double[data_size];
                 // Calculate data for tests
-                for( int i = 0; i < data_size; i++){
+                for( long i = 0; i < data_size; i++){
                     // Initial velocity is 0
-                    float update_result = Sim_Funcs.Update_Data_Calc(velocity[i], accelerations[i], timestep);
+                    double update_result = Sim_Funcs.Update_Data_Calc(velocity[i], accelerations[i], timestep);
                     updated_velocity[i] = update_result;
                 }
 
-                float[] updated_positions = new float[data_size];
+                double[] updated_positions = new double[data_size];
                 // Calculate data for tests
-                for( int i = 0; i < data_size; i++){
-                    float update_result = Sim_Funcs.Update_Data_Calc(positions[i], updated_velocity[i], timestep);
+                for( long i = 0; i < data_size; i++){
+                    double update_result = Sim_Funcs.Update_Data_Calc(positions[i], updated_velocity[i], timestep);
                     updated_positions[i] = update_result;
                 }
 
@@ -157,7 +156,7 @@ namespace Lennard_Jones
                         }
 
                         if(m-n > 2 || m >= data_size){
-                            float input_result = Funcs.FromUint(position_ramresult.Data);
+                            double input_result = Funcs.FromUlong(position_ramresult.Data);
                             if(Math.Abs(updated_positions[n] - input_result) > 0.00001f)
                                 Console.WriteLine("Update position result - Got {0}, expected {1} at {2}",
                                         input_result, updated_positions[n], n);

@@ -21,13 +21,13 @@ namespace Velocity_Update
         public ValBus updated_velocity;
 
         [InputBus]
-        public RamResultUint acceleration_data_point_ramresult;
+        public RamResultUlong acceleration_data_point_ramresult;
         
         [OutputBus]
-        public RamCtrlUint acceleration_data_point_ramctrl;
+        public RamCtrlUlong acceleration_data_point_ramctrl;
 
         [InputBus]
-        public TrueDualPortMemory<uint>.IReadResultB velocity_ramresult;
+        public TrueDualPortMemory<ulong>.IReadResultB velocity_ramresult;
 
         [OutputBus]
         public ValBus prev_velocity = Scope.CreateBus<ValBus>();
@@ -39,13 +39,13 @@ namespace Velocity_Update
         public FlagBus finished = Scope.CreateBus<FlagBus>();
         
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlB velocity_ramctrl;
+        public TrueDualPortMemory<ulong>.IControlB velocity_ramctrl;
 
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlA updated_velocity_ramctrl;
+        public TrueDualPortMemory<ulong>.IControlA updated_velocity_ramctrl;
 
         uint data_size;
-        float delta_timestep;
+        double delta_timestep;
 
         int index;
         int ram_return_index;
@@ -53,8 +53,8 @@ namespace Velocity_Update
         bool running = false;
         uint ready_to_read;
 
-        public Manager(uint size, float timestep){
-            data_size = size;
+        public Manager(ulong size, double timestep){
+            data_size = (uint)size;
             delta_timestep = timestep;
         }
 
@@ -98,7 +98,7 @@ namespace Velocity_Update
 
                 // Update velocity and acceleration ram addresses
                 if(index < ready_to_read){
-                    acceleration_data_point_ramctrl.Address = (uint)index;
+                    acceleration_data_point_ramctrl.Address = (ulong)index;
                     velocity_ramctrl.Address = (int)index;
                     index++;
                 } else {

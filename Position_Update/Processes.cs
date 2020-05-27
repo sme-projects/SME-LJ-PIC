@@ -20,10 +20,10 @@ namespace Position_Update
         public ValBus updated_position;
 
         [InputBus]
-        public TrueDualPortMemory<uint>.IReadResultB velocity_data_point_ramresult;
+        public TrueDualPortMemory<ulong>.IReadResultB velocity_data_point_ramresult;
 
         [InputBus]
-        public TrueDualPortMemory<uint>.IReadResultA position_ramresult;
+        public TrueDualPortMemory<ulong>.IReadResultA position_ramresult;
 
         [OutputBus]
         public ValBus prev_position = Scope.CreateBus<ValBus>();
@@ -35,23 +35,23 @@ namespace Position_Update
         public FlagBus finished = Scope.CreateBus<FlagBus>();
         
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlB velocity_data_point_ramctrl;
+        public TrueDualPortMemory<ulong>.IControlB velocity_data_point_ramctrl;
 
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlA position_ramctrl;
+        public TrueDualPortMemory<ulong>.IControlA position_ramctrl;
 
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlB updated_position_ramctrl;
+        public TrueDualPortMemory<ulong>.IControlB updated_position_ramctrl;
 
         uint data_size;
-        float delta_timestep;
+        double delta_timestep;
 
         int index = 0;
         int result_index = 0;
         bool running = false;
 
-        public Manager(uint size, float timestep){
-            data_size = size;
+        public Manager(ulong size, double timestep){
+            data_size = (uint)size;
             delta_timestep = timestep;
         }
 

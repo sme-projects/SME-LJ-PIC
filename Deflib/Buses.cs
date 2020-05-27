@@ -8,7 +8,7 @@ namespace Deflib
     public interface ValBus : IBus
     {
         [InitialValue(0)]
-        uint val { get; set; }
+        ulong val { get; set; }
         [InitialValue(false)]
         bool valid { get; set; }
     }
@@ -22,19 +22,19 @@ namespace Deflib
 
 
     [InitializedBus]
-    public interface RamCtrlUint : IBus
+    public interface RamCtrlUlong : IBus
     {
         bool Enabled { get; set; }
-        uint Address { get; set; }
-        uint Data { get; set; }
+        ulong Address { get; set; }
+        ulong Data { get; set; }
         bool IsWriting { get; set; }
         
     }
 
     [InitializedBus]
-    public interface RamResultUint : IBus
+    public interface RamResultUlong : IBus
     {
-        uint Data { get; set; }
+        ulong Data { get; set; }
     }
 
     
@@ -44,17 +44,17 @@ namespace Deflib
         [InitialValue(false)]
         bool Enabled { get; set; }
         [InitialValue(0)]
-        uint Address { get; set; }
+        ulong Address { get; set; }
         [InitialValue(false)]
         bool IsWriting { get; set; }
         [FixedArrayLength((int)Cache_size.n)] // width of array bus
-        IFixedArray<uint> Data { get; set; }
+        IFixedArray<ulong> Data { get; set; }
     }
 
     public interface RamResultArray : IBus
     {
         [FixedArrayLength((int)Cache_size.n)] // width of array bus
-        IFixedArray<uint> Data { get; set; }
+        IFixedArray<ulong> Data { get; set; }
     }
 
 

@@ -11,15 +11,15 @@ namespace Acceleration
 
         static void Main(string[] args)
         {
-            for(int i = 0; i < 2; i++){
+            for(long i = 0; i < 2; i++){
                 using(var sim = new Simulation()){
 
                     // TODO: This fails when data is 1 in size.
-                    uint data_size = 10;
+                    ulong data_size = 10;
                     
                     
                     // RAM
-                    var position_ram = new TrueDualPortMemory<uint>((int)data_size);
+                    var position_ram = new TrueDualPortMemory<ulong>((int)data_size);
                     
                     // Multiplexer
                     var multiplexer = new Multiplexer_ControlA();
@@ -72,7 +72,7 @@ namespace Acceleration
             this.input_pos2 = input_pos2;
 
             // Constants
-            float MASS_OF_ARGON = 39.948f;
+            double MASS_OF_ARGON = 39.948;
 
             // Constant processes
             var const_mass_of_argon = new Constants(MASS_OF_ARGON);
@@ -108,7 +108,7 @@ namespace Acceleration
         public ValBus input;
         public ValBus output;
 
-        public int depth = 8;
+        public long depth = 8;
 
         public Force(ValBus input)
         {   
@@ -116,15 +116,15 @@ namespace Acceleration
 
 
             // Constants
-            float SIGMA = 3.4f;
-            float EPSILON = 0.0103f;
-            float TWELVE = 12.0f;
-            float SIX = 6.0f;
-            float FOURTEEN = 14.0f;
-            float EIGHT = 8.0f;
-            float FOURTYEIGHT = 48.0f;
-            float TWENTYFOUR = 24.0f;
-            float FOUR = 4.0f;
+            double SIGMA = 3.4;
+            double EPSILON = 0.0103;
+            double TWELVE = 12.0;
+            double SIX = 6.0;
+            double FOURTEEN = 14.0;
+            double EIGHT = 8.0;
+            double FOURTYEIGHT = 48.0;
+            double TWENTYFOUR = 24.0;
+            double FOUR = 4.0;
             
 
             // Constant processes

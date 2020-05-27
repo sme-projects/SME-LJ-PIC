@@ -13,10 +13,10 @@ namespace Acceleration {
         public ValBus ready;
 
         [InputBus]
-        public TrueDualPortMemory<uint>.IReadResultA pos1_ramresult;
+        public TrueDualPortMemory<ulong>.IReadResultA pos1_ramresult;
         
         [InputBus]
-        public TrueDualPortMemory<uint>.IReadResultB pos2_ramresult;
+        public TrueDualPortMemory<ulong>.IReadResultB pos2_ramresult;
 
         [OutputBus]
         public ValBus pos1_output = Scope.CreateBus<ValBus>();
@@ -31,17 +31,17 @@ namespace Acceleration {
         public ValBus acceleration_ready_output = Scope.CreateBus<ValBus>();
 
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlA pos1_ramctrl;
+        public TrueDualPortMemory<ulong>.IControlA pos1_ramctrl;
 
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlB pos2_ramctrl;
+        public TrueDualPortMemory<ulong>.IControlB pos2_ramctrl;
 
 
         bool running = false;
-        int clock_count = 0;
-        int i = 0;
-        int j = 1;
-        uint length = 0;
+        long clock_count = 0;
+        long i = 0;
+        long j = 1;
+        long length = 0;
 
 
         protected override void OnTick() {
@@ -53,21 +53,21 @@ namespace Acceleration {
                 clock_count = 0;
                 i = 0;
                 j = 1;
-                length = ready.val; 
+                length = (long)ready.val; 
                 running = true;
-                acceleration_ready_output.val = length;
+                acceleration_ready_output.val = (ulong)length;
                 acceleration_ready_output.valid = true;
             }else {
                 acceleration_ready_output.valid = false;
             }
             if(running){
                 pos1_ramctrl.Enabled = i < length - 1;
-                pos1_ramctrl.Address = i;
+                pos1_ramctrl.Address = (int)i;
                 pos1_ramctrl.Data = 0;
                 pos1_ramctrl.IsWriting = false;
                 
                 pos2_ramctrl.Enabled = j < length;
-                pos2_ramctrl.Address = j;
+                pos2_ramctrl.Address = (int)j;
                 pos2_ramctrl.Data = 0;
                 pos2_ramctrl.IsWriting = false;
                 if(clock_count >= 2){

@@ -12,14 +12,14 @@ namespace Position_Update
         {
             using(var sim = new Simulation())
             {
-                int data_size = 24;
-                float timestep_size = 10.1f;
+                long data_size = 24;
+                double timestep_size = 10.1;
 
-                var position_ram = new TrueDualPortMemory<uint>(data_size);
-                var velocity_ram = new TrueDualPortMemory<uint>(data_size);
+                var position_ram = new TrueDualPortMemory<ulong>((int)data_size);
+                var velocity_ram = new TrueDualPortMemory<ulong>((int)data_size);
 
-                var testing_simulator = new Testing_Simulation((uint)data_size, timestep_size);
-                var position_manager = new Manager((uint)data_size, timestep_size);
+                var testing_simulator = new Testing_Simulation((ulong)data_size, timestep_size);
+                var position_manager = new Manager((ulong)data_size, timestep_size);
                 
                 
 
@@ -59,7 +59,7 @@ namespace Position_Update
         public ValBus velocity_data_point;
         public ValBus updated_data_point;
 
-        public Update_position(ValBus prev_data_point, ValBus velocity_data_point, float timestep)
+        public Update_position(ValBus prev_data_point, ValBus velocity_data_point, double timestep)
         {
             this.prev_data_point = prev_data_point;
             this.velocity_data_point = velocity_data_point;

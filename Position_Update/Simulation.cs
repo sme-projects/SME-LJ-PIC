@@ -17,7 +17,7 @@ namespace Position_Update{
         public FlagBus finished;
 
         [InputBus]
-        public TrueDualPortMemory<uint>.IReadResultB data_point_ramresult;
+        public TrueDualPortMemory<ulong>.IReadResultB data_point_ramresult;
 
         [OutputBus]
         public FlagBus sim_ready = Scope.CreateBus<FlagBus>();
@@ -26,21 +26,21 @@ namespace Position_Update{
         public FlagBus data_ready = Scope.CreateBus<FlagBus>();
 
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlB data_point_ramctrl;
+        public TrueDualPortMemory<ulong>.IControlB data_point_ramctrl;
         [OutputBus]
-        public TrueDualPortMemory<uint>.IControlA velocity_data_point_ramctrl;
+        public TrueDualPortMemory<ulong>.IControlA velocity_data_point_ramctrl;
 
        
 
 
 
-        public Testing_Simulation(uint data_size, float timestep_size){
-            this.data_size = data_size;
+        public Testing_Simulation(ulong data_size, double timestep_size){
+            this.data_size = (uint)data_size;
             this.timestep = timestep_size;
         }
 
         private uint data_size;
-        private float timestep;
+        private double timestep;
 
         public override async System.Threading.Tasks.Task Run()
         {
@@ -52,31 +52,31 @@ namespace Position_Update{
             //// Testing data
 
             // Generate random data for testing
-            float[] position_data = new float[data_size];
-            for(int i = 0; i < data_size; i++){
-                int random_number = rnd.Next(10,1000);
-                if(!position_data.Contains((float) random_number))
-                    position_data[i] = (float) random_number;
+            double[] position_data = new double[data_size];
+            for(long i = 0; i < data_size; i++){
+                long random_number = rnd.Next(10,1000);
+                if(!position_data.Contains((double) random_number))
+                    position_data[i] = (double) random_number;
                 else
                     i--;
             }
 
             // Creating random or non-random data variables as the external 
             // variables in the formula
-            float[] random_velocity_data = new float[data_size];
-            float[] velocity_data = new float[data_size];
+            double[] random_velocity_data = new double[data_size];
+            double[] velocity_data = new double[data_size];
             
             // Generate random data for testing
-            for(uint i = 0; i < data_size; i++){
-                int random_number = rnd.Next(10,100);
-                if(!random_velocity_data.Contains((float) random_number))
-                    random_velocity_data[i] = (float) random_number;
+            for(ulong i = 0; i < data_size; i++){
+                long random_number = rnd.Next(10,100);
+                if(!random_velocity_data.Contains((double) random_number))
+                    random_velocity_data[i] = (double) random_number;
                 else
                     i--;
             }
 
             // Generate data for testing
-            for(uint i = 0; i < data_size; i++)
+            for(ulong i = 0; i < data_size; i++)
                 velocity_data[i] = i + 1;
 
 
@@ -85,13 +85,13 @@ namespace Position_Update{
                 // Data points
                 data_point_ramctrl.Enabled = true;
                 data_point_ramctrl.Address = i;
-                data_point_ramctrl.Data = Funcs.FromFloat(position_data[i]);
+                data_point_ramctrl.Data = Funcs.FromDouble(position_data[i]);
                 data_point_ramctrl.IsWriting = true;
 
                 // External variable data points
                 velocity_data_point_ramctrl.Enabled = true;
                 velocity_data_point_ramctrl.Address = i;
-                velocity_data_point_ramctrl.Data = Funcs.FromFloat(random_velocity_data[i]);
+                velocity_data_point_ramctrl.Data = Funcs.FromDouble(random_velocity_data[i]);
                 velocity_data_point_ramctrl.IsWriting = true;
 
                 await ClockAsync();
@@ -101,10 +101,10 @@ namespace Position_Update{
             data_point_ramctrl.Enabled = false;
             data_point_ramctrl.IsWriting = false;
 
-            float[] updated_data_points = new float[data_size];
+            double[] updated_data_points = new double[data_size];
             // Calculate data for tests
-            for( int i = 0; i < data_size; i++){
-                float update_result = Sim_Funcs.Update_Data_Calc(position_data[i], random_velocity_data[i], timestep);
+            for( long i = 0; i < data_size; i++){
+                double update_result = Sim_Funcs.Update_Data_Calc(position_data[i], random_velocity_data[i], timestep);
                 updated_data_points[i] = update_result;
             }
 
@@ -134,7 +134,7 @@ namespace Position_Update{
                     }
 
                     if(k-n > 2 || k >= random_velocity_data.Length){
-                        float input_result = Funcs.FromUint(data_point_ramresult.Data);
+                        double input_result = Funcs.FromUlong(data_point_ramresult.Data);
                         if(updated_data_points[n] - input_result > 0.0f)
                             Console.WriteLine("Update data result - Got {0}, expected {1} at {2}",
                                     input_result, updated_data_points[n], n);
