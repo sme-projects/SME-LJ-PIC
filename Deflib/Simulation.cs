@@ -8,6 +8,12 @@ namespace Deflib{
         static double SIGMA = 3.4;
         static double EPSILON = 0.0103;
 
+        public static double Magnitude_Calc(double xcoord)
+        {
+            double result = Math.Sqrt(xcoord*xcoord);
+            return result;
+        }
+
         public static double Update_Data_Calc(double prev_data_point, double external_data_point, double timestep)
         {
             double result = prev_data_point + (external_data_point * timestep);
