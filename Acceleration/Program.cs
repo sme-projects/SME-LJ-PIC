@@ -78,9 +78,9 @@ namespace Acceleration
             var const_mass_of_argon = new Constants(MASS_OF_ARGON);
 
             // Calculation processes
-            var min             = new Min();
+            var sub             = new Sub();
             // TODO: Add calculations for more dimensions 
-            Force force = new Force(min.difference);
+            Force force = new Force(sub.difference);
 
             // Piping min.difference through force
             var npipe = new nPipe(force.depth);
@@ -89,9 +89,9 @@ namespace Acceleration
             var div_mass        = new Div();
 
 
-            min.minuend                             = input_pos2;
-            min.subtrahend                          = input_pos1;
-            npipe.first.input                       = min.difference;
+            sub.minuend                             = input_pos2;
+            sub.subtrahend                          = input_pos1;
+            npipe.first.input                       = sub.difference;
             mul.multiplicant                        = force.output;
             mul.multiplier                          = npipe.last.output;
             div_mass.divident                       = mul.product;
@@ -158,7 +158,7 @@ namespace Acceleration
             var mul_eps_6_8     = new Mul();
             var mul_48          = new Mul();
             var mul_24          = new Mul();
-            var minus           = new Min();
+            var sub             = new Sub();
             
             
             /* NOTE: e^{x*ln(b)} == b^x*/
@@ -199,10 +199,10 @@ namespace Acceleration
             mul_24.multiplicant                     = const_twentyfour.output;
             mul_24.multiplier                       = mul_eps_6_8.product;
 
-            minus.minuend                           = mul_48.product;
-            minus.subtrahend                        = mul_24.product;
+            sub.minuend                             = mul_48.product;
+            sub.subtrahend                          = mul_24.product;
 
-            output                                  = minus.difference;
+            output                                  = sub.difference;
         }
     }
 }

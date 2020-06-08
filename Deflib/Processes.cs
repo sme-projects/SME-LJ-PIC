@@ -64,12 +64,12 @@ namespace Deflib {
     }
 
 
-    // Minus process with floating point
+    // Subtract process with floating point
     // Input: A minuend and a subtrahend (ulong)
     // Output: A difference (ulong)
     // minuend - subtrahend = difference
     [ClockedProcess]
-    public class Min : SimpleProcess 
+    public class Sub : SimpleProcess 
     {
         [InputBus]
         public ValBus minuend;
@@ -206,6 +206,32 @@ namespace Deflib {
                 quotient.valid = true;
             } else {
                 quotient.valid = false;
+            }
+        }
+    }
+
+    // Squareroot process with floating point
+    // Input: A value (ulong)
+    // Output: A result (ulong)
+    // sqrt(input) = output
+    [ClockedProcess]
+    public class Sqrt : SimpleProcess 
+    {
+        [InputBus]
+        public ValBus input;
+
+        [OutputBus]
+        public ValBus output = Scope.CreateBus<ValBus>();
+
+        protected override void OnTick()
+        {
+            if(input.valid){
+                double double_input = Funcs.FromUlong(input.val);
+                double double_output = Math.Sqrt(double_input);
+                output.val = Funcs.FromDouble(double_output);
+                output.valid = true;
+            } else {
+                output.valid = false;
             }
         }
     }
