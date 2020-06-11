@@ -15,7 +15,7 @@ namespace Acceleration
                 using(var sim = new Simulation()){
 
                     // TODO: This fails when data is 1 in size.
-                    ulong data_size = 10;
+                    ulong data_size = 20;
                     
                     
                     // RAM
@@ -28,10 +28,15 @@ namespace Acceleration
                     var manager = new Manager();
 
                     var testing_simulator = new Testing_Simulation(data_size);
-                    // TODO: Make the manager handle the result from acceleration and sent to test/cache 
-                    Acceleration acceleration = new Acceleration(manager.pos1_output, manager.pos2_output);
-                    
 
+                    var testing_magnitude = new Testing_Magnitude(data_size);
+
+                    // TODO: Make the manager handle the result from acceleration and sent to test/cache 
+                    Acceleration acceleration = 
+                        new Acceleration(manager.pos1_output, manager.pos2_output, 
+                                         testing_magnitude.output);
+
+                    testing_magnitude.input = acceleration.mag_input;
 
                     manager.ready = testing_simulator.ready_signal;
                     testing_simulator.position_ramctrl = multiplexer.first_input;
@@ -41,7 +46,7 @@ namespace Acceleration
                     manager.pos1_ramresult = position_ram.ReadResultA;
                     manager.pos2_ramresult = position_ram.ReadResultB;
                     testing_simulator.testing_result_input = acceleration.output;
-                    
+                    testing_magnitude.finished = testing_simulator.mag_sim_finished;
                     
                     sim
                     // // .AddTopLevelInputs(acceleration_cache.acceleration_input, acceleration_cache.ready, testing_simulator.acc_ramctrl)
@@ -61,15 +66,19 @@ namespace Acceleration
     {
         public ValBus input_pos1;
         public ValBus input_pos2;
+        public ValBus mag_input;
+        public ValBus mag_output;
         public ValBus output;
 
 
 
 
-        public Acceleration(ValBus input_pos1, ValBus input_pos2)
+        public Acceleration(ValBus input_pos1, ValBus input_pos2,
+                            ValBus magnitude_output)
         {
             this.input_pos1 = input_pos1;
             this.input_pos2 = input_pos2;
+            this.mag_output = magnitude_output;
 
             // Constants
             double MASS_OF_ARGON = 39.948;
@@ -79,11 +88,16 @@ namespace Acceleration
 
             // Calculation processes
             var sub             = new Sub();
-            // TODO: Add calculations for more dimensions 
-            Force force = new Force(sub.difference);
 
-            // Piping min.difference through force
-            var npipe = new nPipe(force.depth);
+            // TODO: Add calculations for more dimensions 
+            Force force = new Force(mag_output);
+
+            // Piping sub.difference through magnitude
+            var magnitude_pipe = new nPipe((long)Deflib.Magnitude_depth.n);
+
+
+            // Piping sub.difference through force
+            var force_pipe = new nPipe((long)Deflib.Force_depth.n);
 
             var mul             = new Mul();
             var div_mass        = new Div();
@@ -91,9 +105,15 @@ namespace Acceleration
 
             sub.minuend                             = input_pos2;
             sub.subtrahend                          = input_pos1;
-            npipe.first.input                       = sub.difference;
+            // magnitude calculation
+            mag_input                         = sub.difference;
+            // pipe sub.difference through magnitude
+            magnitude_pipe.first.input              = sub.difference;
+            // pipe sub.difference through force
+            force_pipe.first.input                  = magnitude_pipe.last.output;
+
             mul.multiplicant                        = force.output;
-            mul.multiplier                          = npipe.last.output;
+            mul.multiplier                          = force_pipe.last.output;
             div_mass.divident                       = mul.product;
             div_mass.divisor                        = const_mass_of_argon.output;
             output                                  = div_mass.quotient;
@@ -107,8 +127,6 @@ namespace Acceleration
 
         public ValBus input;
         public ValBus output;
-
-        public long depth = 8;
 
         public Force(ValBus input)
         {   

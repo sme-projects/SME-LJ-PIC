@@ -64,7 +64,7 @@ namespace Magnitude
 
                         // TODO: Figure out what the expected and accepted difference can be
                         // if(Math.Abs(calc_result - input_result) > 1/(Math.Pow(10,7)))
-                            Console.WriteLine("Magnitude test sim - Got {0}, Expected {0}", input_result, calc_result);
+                            Console.WriteLine("Magnitude test sim - Got {0}, Expected {1}", input_result, calc_result);
                         
                         if(j >= (uint)data_size - 1){
                             running = false;

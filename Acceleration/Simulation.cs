@@ -23,6 +23,10 @@ namespace Acceleration{
         [OutputBus]
         public ValBus ready_signal = Scope.CreateBus<ValBus>();
 
+        // Bus only in use when testing Acceleration module seperately 
+        [OutputBus]
+        public FlagBus mag_sim_finished = Scope.CreateBus<FlagBus>();
+
         public Testing_Simulation(ulong data_size){
             this.data_size = data_size;
         }
@@ -39,12 +43,12 @@ namespace Acceleration{
             // generated correctly
             double[] positions = new double[data_size];
             for(ulong k = 0; k < data_size; k++){
-                // long random_number = rnd.Next(10,1000);
-                // double double_rnd_number = random_number;
-                // if(!positions.Contains((double) random_number))
-                //     positions[k] = (double) random_number;
-                // else
-                //     k--;
+            //     long random_number = rnd.Next(10,1000);
+            //     double double_rnd_number = random_number;
+            //     if(!positions.Contains((double) random_number))
+            //         positions[k] = (double) random_number;
+            //     else
+            //         k--;
                 // Non-random data:
                 positions[k] = (double) k + 1;
             }
@@ -64,10 +68,11 @@ namespace Acceleration{
             await ClockAsync();
             ready_signal.valid = false;
 
-            long i = 0;
-            long j = 1;
+            ulong i = 0;
+            ulong j = 1;
             Queue<double> calculated_result_queue = new Queue<double>();
             while(running){
+                mag_sim_finished.valid = false;
 
                 if(testing_result_input.valid){
                     // TODO: Rename the control result to something with "control result"
@@ -79,15 +84,14 @@ namespace Acceleration{
 
                         // TODO: Figure out what the expected and accepted difference can be
                         if(Math.Abs(calc_result - input_result) > 1/(Math.Pow(10,7))){
-                            Console.WriteLine("pos1 {0}: {1}, pos2 {2}: {3}", i, positions[i], j, positions[j]);
-                            Console.WriteLine("Acceleration test sim - Got {0}, Expected {0}", input_result, calc_result);
-                            // Console.WriteLine($"Acc difference : Got {Math.Abs(calc_result - input_result)}");
+                            Console.WriteLine("pos {0}: {1}, pos {2}: {3}", i, positions[i], j, positions[j]);
+                            Console.WriteLine("Acceleration test sim - Got {0}, Expected {1}", input_result, calc_result);
                         }
-                        if(i >= (uint)data_size - 2){
+                        if(i >= data_size - 2){
                             running = false;
                             Console.WriteLine("Acceleration test successfully completed");
                         }
-                        if(j >= (uint)data_size -1 ){
+                        if(j >= data_size -1 ){
                             i++;
                             j = i + 1;
                         }else{
@@ -95,6 +99,53 @@ namespace Acceleration{
                         }
                     }
                 }
+                await ClockAsync();
+            }
+            mag_sim_finished.valid = true;
+        }
+    }
+
+    public class Testing_Magnitude : SimulationProcess
+    {
+        [InputBus]
+        public ValBus input;
+
+        [InputBus]
+        public FlagBus finished;
+
+        [OutputBus]
+        public ValBus output = Scope.CreateBus<ValBus>();
+
+
+
+        public Testing_Magnitude(ulong data_size){
+            this.data_size = data_size;
+        }
+
+        private ulong data_size;
+
+        public override async System.Threading.Tasks.Task Run(){
+
+            await ClockAsync();
+            bool running = true;
+            int depth_size = (int)Deflib.Magnitude_depth.n;
+            double[] val_queue = new double[depth_size];
+            bool[] valid_queue = new bool[depth_size];
+
+
+            while(running){
+                output.valid = valid_queue[depth_size - 1]; 
+                output.val = Funcs.FromDouble(val_queue[depth_size - 1]);
+                for (int i = depth_size - 1; i > 0; i--){
+                    val_queue[i] = val_queue[i-1];
+                    valid_queue[i] = valid_queue[i-1];
+                }
+                double val = Funcs.FromUlong(input.val);
+                val = Math.Abs(val);
+                val_queue[0] = val;
+                valid_queue[0] = input.valid;
+                if(finished.valid)
+                    running = false;
                 await ClockAsync();
             }
         }
