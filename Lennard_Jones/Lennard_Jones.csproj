@@ -19,6 +19,7 @@
     <ProjectReference Include="../Acceleration/Acceleration.csproj" />
     <ProjectReference Include="../Velocity_Update/Velocity_Update.csproj" />
     <ProjectReference Include="../Position_Update/Position_Update.csproj" />
+    <ProjectReference Include="../Magnitude/Magnitude.csproj" />
   </ItemGroup>
 
 </Project>

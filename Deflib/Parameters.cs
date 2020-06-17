@@ -12,7 +12,7 @@ namespace Deflib
     };
 
     public enum Force_depth : ulong {
-        n = 9,
+        n = 8,
     };
 
     public enum Acceleration_depth : ulong {

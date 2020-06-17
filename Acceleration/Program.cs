@@ -36,7 +36,7 @@ namespace Acceleration
                         new Acceleration(manager.pos1_output, manager.pos2_output, 
                                          testing_magnitude.output);
 
-                    testing_magnitude.input = acceleration.mag_input;
+                    testing_magnitude.x_coord = acceleration.mag_input;
 
                     manager.ready = testing_simulator.ready_signal;
                     testing_simulator.position_ramctrl = multiplexer.first_input;

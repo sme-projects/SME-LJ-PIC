@@ -42,10 +42,16 @@ namespace Lennard_Jones
                 // Cache
                 var acceleration_cache_x = new Cache.AccelerationCache((ulong)Cache_size.n);
                 
+                var magnitude = new Magnitude.Magnitude();
+
                 // Acceleration class
                 Acceleration.Acceleration acceleration_x = 
                     new Acceleration.Acceleration(acceleration_manager_x.pos1_output,
-                                     acceleration_manager_x.pos2_output);
+                                     acceleration_manager_x.pos2_output, magnitude.output);
+                
+                magnitude.input_proc.multiplicant = acceleration_x.mag_input;
+                magnitude.input_proc.multiplier = acceleration_x.mag_input;
+
                 // Velocity class
                 Velocity_Update.Update_velocity velocity_x = 
                     new Velocity_Update.Update_velocity(velocity_manager_x.prev_velocity, 

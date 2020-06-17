@@ -17,8 +17,9 @@ namespace Magnitude
         public ValBus output = Scope.CreateBus<ValBus>();
 
 
-        public Testing_Simulation(ulong data_size){
+        public Testing_Simulation(ulong data_size, ValBus input){
             this.data_size = (uint)data_size;
+            this.input = input;
         }
 
         private uint data_size;
@@ -63,7 +64,7 @@ namespace Magnitude
                         double input_result = Funcs.FromUlong(input.val);
 
                         // TODO: Figure out what the expected and accepted difference can be
-                        // if(Math.Abs(calc_result - input_result) > 1/(Math.Pow(10,7)))
+                        if(Math.Abs(calc_result - input_result) > 1/(Math.Pow(10,7)))
                             Console.WriteLine("Magnitude test sim - Got {0}, Expected {1}", input_result, calc_result);
                         
                         if(j >= (uint)data_size - 1){

@@ -108,7 +108,7 @@ namespace Acceleration{
     public class Testing_Magnitude : SimulationProcess
     {
         [InputBus]
-        public ValBus input;
+        public ValBus x_coord;
 
         [InputBus]
         public FlagBus finished;
@@ -126,24 +126,25 @@ namespace Acceleration{
 
         public override async System.Threading.Tasks.Task Run(){
 
-            await ClockAsync();
+            // await ClockAsync();
             bool running = true;
             int depth_size = (int)Deflib.Magnitude_depth.n;
-            double[] val_queue = new double[depth_size];
-            bool[] valid_queue = new bool[depth_size];
+            double[] val_queue = new double[depth_size - 1];
+            bool[] valid_queue = new bool[depth_size - 1];
 
+            int last_index = depth_size - 2;
 
             while(running){
-                output.valid = valid_queue[depth_size - 1]; 
-                output.val = Funcs.FromDouble(val_queue[depth_size - 1]);
-                for (int i = depth_size - 1; i > 0; i--){
+                output.valid = valid_queue[last_index]; 
+                output.val = Funcs.FromDouble(val_queue[last_index]);
+                for (int i = last_index; i > 0; i--){
                     val_queue[i] = val_queue[i-1];
                     valid_queue[i] = valid_queue[i-1];
                 }
-                double val = Funcs.FromUlong(input.val);
+                double val = Funcs.FromUlong(x_coord.val);
                 val = Math.Abs(val);
                 val_queue[0] = val;
-                valid_queue[0] = input.valid;
+                valid_queue[0] = x_coord.valid;
                 if(finished.valid)
                     running = false;
                 await ClockAsync();
