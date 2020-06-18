@@ -50,6 +50,8 @@
 
 \begin{document}
 
+\section{Modules}
+
 % -------------------------------------------------
 % Acceleration 1.1
 
@@ -298,5 +300,118 @@
     \caption{Full LJ circuit}
 \end{figure}
 
+% -------------------------------------------------
+% Cache 1.1
+
+
+\section{Function wrappers}
+$$\left(48 \cdot \epsilon \cdot \left( \frac{\sigma^{12}}{r^{14}}\right)\right) - \left(24 \cdot \epsilon \cdot\left(\frac{\sigma^6}{r^8} \right) \right)$$
+\begin{figure}
+    \centering
+    \scalebox{0.8}{
+        \begin{tikzpicture}
+
+            \node[process] (twelve) at (-6.5,0) {const(12)};
+            \node[process] (six) at (-1.5,0) {const(6)};
+            \node[process] (sigma) at (-4,0) {const($\sigma$)};
+            \node[process] (abs_sigma) at (-4,-2.5) {abs()};
+            \node[process] (ln_sigma) at (-4,-4.5) {ln()};
+
+            \node[process] (fourteen) at (1.5,0) {const(14)};
+            \node[process] (eight) at (6.5,0) {const(8)};
+            \node[process] (abs_r) at (4,-2.5) {abs()};
+            \node[process] (ln_r) at (4,-4.5) {ln()};
+
+
+            \node[process] (mul_12) at (-5.2,-6.5) {mul()};
+            \node[process] (mul_6) at (-2.8,-6.5) {mul()};
+
+            \node[process] (mul_14) at (2.8,-6.5) {mul()};
+            \node[process] (mul_8) at (5.2,-6.5) {mul()};
+
+            \node[process] (exp_12) at (-5.2,-8.5) {exp()};
+            \node[process] (exp_6) at (-2.8,-8.5) {exp()};
+
+            \node[process] (exp_14) at (2.8,-8.5) {exp()};
+            \node[process] (exp_8) at (5.2,-8.5) {exp()};
+            
+            \node[process] (div_12_14) at (-4,-11) {div()};
+            \node[process] (div_6_8) at (4,-11) {div()};
+
+            \node[process] (epsilon) at (0,-11) {const($\epsilon$)};
+
+            \node[process] (mul_12_14_eps) at (-2.8,-13) {mul()};
+            \node[process] (mul_6_8_eps) at (2.8,-13) {mul()};
+
+            \node[process] (fortyeight) at (-5.5,-13) {const(48)};
+            \node[process] (twentyfour) at (5.5,-13) {const(24)};
+
+            \node[process] (mul_48) at (-4,-15) {mul()};
+            \node[process] (mul_24) at (4,-15) {mul()};
+
+            \node[process] (min) at (0,-17) {min()};
+            
+
+            \path[draw, ->] (sigma.270) -- (abs_sigma.90);
+            \path[draw, ->] (4,1) -- (abs_r.90) node [near end] {\footnotesize $r$};
+
+            \path[draw, ->] (abs_sigma.270) -- (ln_sigma.90);
+            \path[draw, ->] (abs_r.270) -- (ln_r.90);
+
+
+            \path[draw, ->] (twelve.270) |- (-5.5, -5.5) -| (mul_12.110);
+            \path[draw, ->] (ln_sigma.270) |- (-4.5, -5.5) -| (mul_12.70);
+            
+            \path[draw, ->] (six.270) |- (-2, -5.5) -| (mul_6.70);
+            \path[draw, ->] (ln_sigma.270) |- (-3.5, -5.5) -| (mul_6.110);
+
+            \path[draw, ->] (fourteen.270) |- (2, -5.5) -| (mul_14.110);
+            \path[draw, ->] (ln_r.270) |- (3.5, -5.5) -| (mul_14.70);
+            
+            \path[draw, ->] (eight.270) |- (5.5, -5.5) -| (mul_8.70);
+            \path[draw, ->] (ln_r.270) |- (4.5, -5.5) -| (mul_8.110);
+
+            \path[draw, ->] (mul_12.270) -- (exp_12.90);
+            \path[draw, ->] (mul_6.270) -- (exp_6.90);
+
+            \path[draw, ->] (mul_14.270) -- (exp_14.90);
+            \path[draw, ->] (mul_8.270) -- (exp_8.90);
+
+            \path[draw, ->] (exp_12.270) |- (-4.5, -10) -| (div_12_14.110);
+            \path[draw, ->] (exp_14.270) |- (-3.5, -10) -| (div_12_14.70);
+
+            \path[draw, ->] (exp_6.270) |- (3.5, -9.7) -| (div_6_8.110);
+            \path[draw, ->] (exp_8.270) |- (4.5, -9.7) -| (div_6_8.70);
+
+            \path[draw, ->] (div_12_14.270) |- (-3.5, -12) -| (mul_12_14_eps.110);
+            \path[draw, ->] (epsilon.250) |- (-2.5, -12) -| (mul_12_14_eps.70);
+            
+            \path[draw, ->] (div_6_8.270) |- (3.5, -12) -| (mul_6_8_eps.70);
+            \path[draw, ->] (epsilon.290) |- (2.5, -12) -| (mul_6_8_eps.110);
+
+            \path[draw, ->] (fortyeight.270) |- (-4.5, -14) -| (mul_48.110);
+            \path[draw, ->] (mul_12_14_eps.270) |- (-3.5, -14) -| (mul_48.70);
+
+            \path[draw, ->] (twentyfour.270) |- (4.5, -14) -| (mul_24.70);
+            \path[draw, ->] (mul_6_8_eps.270) |- (3.5, -14) -| (mul_24.110);
+
+            \path[draw, ->] (mul_48.270) |- (-3.5, -16) -| (min.110);
+            \path[draw, ->] (mul_24.270) |- (2.5, -16) -| (min.70);
+
+            \path[draw, ->] (min.270) -- (0,-19) node [near end] {\footnotesize force\_scalar};
+
+
+            % \path[draw, ->] (testsim.282) -- (cache.80) node [near end] {\footnotesize ready};
+            % \path[draw, ->] (cache.10) -| node [near start] {\footnotesize data array/i} (accram.260) node [near end] {\footnotesize \texttt{A}};
+            % \path[draw, ->, red] (accram.280) |- node [pos=0.2] {\footnotesize \texttt{A}} (cache.350) node [near end] {\footnotesize data array};
+            % \path[draw, ->] (testsim.5) -| node [near start] {\footnotesize i} (accram.80) node [near end] {\footnotesize \texttt{B}};
+            % \path[draw, ->, red] (accram.100) |- node [pos=0.32] {\footnotesize \texttt{B}} (testsim.355) node [near end] {\footnotesize data};
+
+            % \path[draw, ->] (cache.180) -| (-2.5,-3) |- (testsim.180) node [midway] {\footnotesize finished};
+
+        \end{tikzpicture}
+    }
+    \caption{Force wrapper}
+\end{figure}
 
 \end{document}
