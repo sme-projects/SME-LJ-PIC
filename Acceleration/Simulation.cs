@@ -129,10 +129,10 @@ namespace Acceleration{
             // await ClockAsync();
             bool running = true;
             int depth_size = (int)Deflib.Magnitude_depth.n;
-            double[] val_queue = new double[depth_size - 1];
-            bool[] valid_queue = new bool[depth_size - 1];
+            double[] val_queue = new double[depth_size];
+            bool[] valid_queue = new bool[depth_size];
 
-            int last_index = depth_size - 2;
+            int last_index = depth_size - 1;
 
             while(running){
                 output.valid = valid_queue[last_index]; 

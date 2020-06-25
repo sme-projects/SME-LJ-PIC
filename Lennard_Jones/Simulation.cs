@@ -9,7 +9,7 @@ using System.Linq;
 namespace Lennard_Jones 
 {
 
-    public class External_Sim : SimulationProcess
+    public class External_LJ_Sim : SimulationProcess
     {
         [InputBus]
         public FlagBus finished;
@@ -34,7 +34,7 @@ namespace Lennard_Jones
 
         
 
-        public External_Sim(ulong data_size, double timestep_size, ulong cache_size)
+        public External_LJ_Sim(ulong data_size, double timestep_size, ulong cache_size)
         {
             this.data_size = (uint)data_size;
             this.timestep = timestep_size;
@@ -115,7 +115,7 @@ namespace Lennard_Jones
                 double[] accelerations = new double[positions.Length];
                 for(long i = 0; i < positions.Length; i++){
                     for(long j = i + 1; j < positions.Length; j++){
-                        double result = Sim_Funcs.Acceleration_Calc(positions[i], positions[j]);
+                        double result = Sim_Funcs.Acceleration_2d_Calc(positions[i], positions[j]);
                         accelerations[i] += result;
                         accelerations[j] += - result;
                     }
