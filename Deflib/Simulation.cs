@@ -8,9 +8,16 @@ namespace Deflib{
         static double SIGMA = 3.4;
         static double EPSILON = 0.0103;
 
-        public static double Magnitude_Calc(double xcoord)
+        // Changed to two dimensions
+        public static double Magnitude_2d_Calc(double coord)
         {
-            double result = Math.Sqrt(xcoord*xcoord);
+            double result = Math.Sqrt(coord*coord + coord*coord);
+            return result;
+        }
+
+        public static double Magnitude_Calc(double coord)
+        {
+            double result = Math.Sqrt(coord*coord);
             return result;
         }
 
@@ -20,6 +27,17 @@ namespace Deflib{
             return result;
         }
 
+
+        // updated for quick testing of 2d
+        public static double Acceleration_2d_Calc(double pos1, double pos2)
+        {
+            double r = pos2 - pos1;
+            double rmag = Magnitude_2d_Calc(r);
+            double f_calc = Force_Calc(rmag);
+            double f = f_calc * r;
+            double result = f / MASS_OF_ARGON;
+            return result;
+        }
 
         public static double Acceleration_Calc(double pos1, double pos2)
         {

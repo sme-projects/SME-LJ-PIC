@@ -19,14 +19,23 @@ namespace Magnitude
                 Magnitude magnitude = new Magnitude();
 
                 // The simulator will be acting as the acceleration class
-                var testing_simulator = 
-                    new Testing_Simulation(data_size, magnitude.output);
+                var tests = new Testing_Simulation[(int)Deflib.Dimensions.n];
 
-                magnitude.input_proc.multiplicant = testing_simulator.output;
-                magnitude.input_proc.multiplier = testing_simulator.output;
+                for (int i = 0; i < (int)Deflib.Dimensions.n; i++){
+                    tests[i] = new Testing_Simulation(data_size, magnitude.output);
+                }
+                // var testing_simulator = 
+                //     new Testing_Simulation(data_size, magnitude.output);
+
+                magnitude.input_procs[0].multiplicant = tests[0].output;
+                magnitude.input_procs[0].multiplier = tests[0].output;
+                magnitude.input_procs[1].multiplicant = tests[1].output;
+                magnitude.input_procs[1].multiplier = tests[1].output;
+
+                // TODO: Add other dimensions to test
                 
 
-                testing_simulator.input = magnitude.output;
+                // tests.input = magnitude.output;
                 sim
                 .Run();
                 Console.WriteLine("Simulation completed");
@@ -37,24 +46,24 @@ namespace Magnitude
 
     public class Magnitude
     {
-        public Mul input_proc;
-        // public ValBus y_coord;
-        // public ValBus z_coord;
+        public Mul[] input_procs;
 
         public ValBus output;
 
         public Magnitude(){
-            // this.x_coord = x_coord;
+            input_procs = new Mul[(int)Deflib.Dimensions.n];
+            for (int i= 0; i < (int)Deflib.Dimensions.n; i++){
+                input_procs[i] = new Mul();
+            }
 
-            var mul = new Mul();
+            
+            var add = new Add();
             var sqrt = new Sqrt();
 
-            input_proc = mul;
+            add.addend = input_procs[0].product;
+            add.augend = input_procs[1].product;
 
-            // mul.multiplicant = x_coord;
-            // mul.multiplier = x_coord;
-
-            sqrt.input = mul.product;
+            sqrt.input = add.sum;
             output = sqrt.output;
 
 

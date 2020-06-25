@@ -34,7 +34,7 @@ namespace Magnitude
             //// Testing data
 
             // Generate random data for testing
-            double[] xcoord_data = new double[data_size];
+            double[] coord_data = new double[data_size];
             // for(long k = 0; k < data_size; k++){
             //     long random_number = rnd.Next(10,1000);
             //     if(!xcoord_data.Contains((double) random_number))
@@ -45,7 +45,7 @@ namespace Magnitude
 
             // Generate data for testing
             for(ulong k = 0; k < data_size; k++)
-                xcoord_data[k] = k + 1;
+                coord_data[k] = k + 1;
         
             long i = 0;
             long j = 0;
@@ -53,11 +53,11 @@ namespace Magnitude
             while(running){
                 if(i < data_size){
                     output.valid = true;
-                    output.val = Funcs.FromDouble(xcoord_data[i]);
+                    output.val = Funcs.FromDouble(coord_data[i]);
                     i++;
                 }
                 if(input.valid){
-                    double calculated_result = Sim_Funcs.Magnitude_Calc(xcoord_data[j]);
+                    double calculated_result = Sim_Funcs.Magnitude_2d_Calc(coord_data[j]);
                     calculated_result_queue.Enqueue(calculated_result);
                     if(j < (uint)data_size){
                         double calc_result = calculated_result_queue.Dequeue();
