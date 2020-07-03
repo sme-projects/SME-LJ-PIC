@@ -18,6 +18,8 @@ namespace Lennard_Jones
 
                 var magnitude = new Magnitude.Magnitude();
 
+                var simulation = new External_Sim(data_size, timestep_size);
+
                 var lennard = new LJ[(int)Deflib.Dimensions.n];
                 for (int i = 0; i < (int)Deflib.Dimensions.n; i++){
                     lennard[i] = new LJ(data_size, timestep_size, magnitude.output);
@@ -29,9 +31,16 @@ namespace Lennard_Jones
                     magnitude.input_procs[i].multiplier = lennard[i].acc.mag_input;
                 }
 
-                // X-dimension
-               
-
+                for (int i = 0; i < (int)Deflib.Dimensions.n; i++){
+                    lennard[i].sim.init_position = simulation.init_position[i];
+                    lennard[i].sim.init_velocity = simulation.init_velocity[i];
+                    
+                }
+                
+                for (int i = 0; i < (int)Deflib.Dimensions.n; i++){
+                    simulation.finished[i] = lennard[i].sim.sim_finished;
+                }
+                
                 sim.Run();
                 Console.WriteLine("Simulation completed");
             }
@@ -43,6 +52,7 @@ namespace Lennard_Jones
     public class LJ{
 
         public Acceleration.Acceleration acc;
+        public External_LJ_Sim sim;
 
         public LJ(ulong data_size, double timestep_size, ValBus mag_output){
             // RAM
@@ -52,6 +62,9 @@ namespace Lennard_Jones
             
             //External simulation process
             var external_simulator = new External_LJ_Sim(data_size, timestep_size, (ulong)Cache_size.n);
+
+            // Connect External_LJ_Simulation field with simulation proccess
+            sim = external_simulator;
 
             // Managers
             var acceleration_manager = new Acceleration.Manager();
@@ -78,9 +91,6 @@ namespace Lennard_Jones
             // Connect Acceleration field with acceleration process
             acc = acceleration;
             
-            // magnitude.input_proc_x.multiplicant = acceleration.mag_input;
-            // magnitude.input_proc_x.multiplier = acceleration.mag_input;
-
             // Velocity class
             Velocity_Update.Update_velocity velocity = 
                 new Velocity_Update.Update_velocity(velocity_manager.prev_velocity, 

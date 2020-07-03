@@ -20,10 +20,10 @@ namespace Deflib
     };
 
     public enum Number_of_loops : ulong{
-        n = 1,
+        n = 2,
     };
 
     public enum Dimensions : ulong{
-        n = 2,
+        n = 3,
     };
 }
