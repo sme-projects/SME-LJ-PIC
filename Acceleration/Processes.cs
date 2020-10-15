@@ -7,7 +7,7 @@ namespace Acceleration {
 
     ////// RAM MANAGER //////
     [ClockedProcess]
-    public class Manager : SimpleProcess
+    public class Acc_manager : SimpleProcess
     {
         [InputBus]
         public ValBus ready;

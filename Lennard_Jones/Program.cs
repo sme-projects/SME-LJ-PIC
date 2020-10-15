@@ -2,8 +2,6 @@
 using SME.Components;
 using System;
 using Deflib;
-using Acceleration;
-using Velocity_Update;
 
 namespace Lennard_Jones
 {
@@ -14,7 +12,7 @@ namespace Lennard_Jones
             using(var sim = new Simulation())
             {
                 ulong data_size = 20;
-                double timestep_size = 10.0;
+                double timestep_size = 0.10;
 
                 var magnitude = new Magnitude.Magnitude();
 
@@ -41,7 +39,17 @@ namespace Lennard_Jones
                     simulation.finished[i] = lennard[i].sim.sim_finished;
                 }
                 
-                sim.Run();
+                sim
+                    .AddTopLevelInputs(simulation.init_velocity[0],
+                                       simulation.init_velocity[1],
+                                       simulation.init_velocity[2],
+                                       simulation.init_position[0], 
+                                       simulation.init_position[1], 
+                                       simulation.init_position[2])
+                    .AddTopLevelOutputs(simulation.finished[0],simulation.finished[1],simulation.finished[2])
+                    .BuildCSVFile()
+                    .BuildVHDL()
+                    .Run();
                 Console.WriteLine("Simulation completed");
             }
         }
@@ -67,9 +75,9 @@ namespace Lennard_Jones
             sim = external_simulator;
 
             // Managers
-            var acceleration_manager = new Acceleration.Manager();
-            var velocity_manager = new Velocity_Update.Manager(data_size, timestep_size);
-            var position_manager = new Position_Update.Manager(data_size, timestep_size);
+            var acceleration_manager = new Acceleration.Acc_manager();
+            var velocity_manager = new Velocity_Update.Vel_manager(data_size, timestep_size);
+            var position_manager = new Position_Update.Pos_manager(data_size, timestep_size);
             
             // Multiplexers
             var init_pos_data_multiplexer = new Multiplexer_ControlA();

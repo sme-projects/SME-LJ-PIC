@@ -8,7 +8,7 @@ namespace Velocity_Update
 
     // Velocity manager is fetching data from a specialised acceleration ram.
     [ClockedProcess]
-    public class Manager : SimpleProcess
+    public class Vel_manager : SimpleProcess
     {
 
         [InputBus]
@@ -53,7 +53,7 @@ namespace Velocity_Update
         bool running = false;
         uint ready_to_read;
 
-        public Manager(ulong size, double timestep){
+        public Vel_manager(ulong size, double timestep){
             data_size = (uint)size;
             delta_timestep = timestep;
         }

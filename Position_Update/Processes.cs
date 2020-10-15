@@ -7,7 +7,7 @@ namespace Position_Update
 {
 
     [ClockedProcess]
-    public class Manager : SimpleProcess
+    public class Pos_manager : SimpleProcess
     {
 
         [InputBus]
@@ -50,7 +50,7 @@ namespace Position_Update
         int result_index = 0;
         bool running = false;
 
-        public Manager(ulong size, double timestep){
+        public Pos_manager(ulong size, double timestep){
             data_size = (uint)size;
             delta_timestep = timestep;
         }

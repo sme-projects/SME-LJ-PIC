@@ -20,7 +20,7 @@ namespace Velocity_Update
                 var acceleration_ram = new Deflib.AccelerationDataRam((ulong)data_size);
                 
                 var testing_simulator = new Testing_Simulation((ulong)data_size, timestep_size, (ulong)Cache_size.n);
-                var velocity_manager = new Manager((ulong)data_size, timestep_size);
+                var velocity_manager = new Vel_manager((ulong)data_size, timestep_size);
                 
                 
 

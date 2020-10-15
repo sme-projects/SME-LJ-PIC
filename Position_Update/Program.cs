@@ -19,7 +19,7 @@ namespace Position_Update
                 var velocity_ram = new TrueDualPortMemory<ulong>((int)data_size);
 
                 var testing_simulator = new Testing_Simulation((ulong)data_size, timestep_size);
-                var position_manager = new Manager((ulong)data_size, timestep_size);
+                var position_manager = new Pos_manager((ulong)data_size, timestep_size);
                 
                 
 

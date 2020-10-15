@@ -6,12 +6,12 @@ using Deflib;
 namespace Acceleration
 {
     
-    class Program
+    public class Program
     {
 
         static void Main(string[] args)
         {
-            for(long i = 0; i < 2; i++){
+            for(long i = 0; i < 1; i++){
                 using(var sim = new Simulation()){
 
                     // TODO: This fails when data is 1 in size.
@@ -25,7 +25,7 @@ namespace Acceleration
                     var multiplexer = new Multiplexer_ControlA();
 
                     // TODO: Give the data_size to manager as an argument
-                    var manager = new Manager();
+                    var manager = new Acc_manager();
 
                     var testing_simulator = new Testing_Simulation(data_size);
 
@@ -37,6 +37,8 @@ namespace Acceleration
                                          testing_magnitude.output);
 
                     testing_magnitude.x_coord = acceleration.mag_input;
+
+                    // throw new Exception();
 
                     manager.ready = testing_simulator.ready_signal;
                     testing_simulator.position_ramctrl = multiplexer.first_input;
