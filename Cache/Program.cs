@@ -4,7 +4,7 @@ using Deflib;
 
 namespace Cache
 {
-    class Program
+    public class Program
     {
 
         static void Main(string[] args)

@@ -155,9 +155,13 @@ namespace Velocity_Update{
 
                     if(k-n > 2 || k >= data_size){
                         double input_result = Funcs.FromUlong(velocity_ramresult.Data);
-                        if(updated_velocity[n] - input_result > 0.0f)
-                            Console.WriteLine("Update data result - Got {0}, expected {1} at {2}",
-                                    input_result, updated_velocity[n], n);
+
+                        // Assertion for unittest
+                        System.Diagnostics.Debug.Assert((Math.Abs(updated_velocity[n] - input_result) < 1/(Math.Pow(10,7))), "SME acceleration did not match C# velocity_update");
+
+                        // if(updated_velocity[n] - input_result > 0.0f)
+                        //     Console.WriteLine("Update data result - Got {0}, expected {1} at {2}",
+                        //             input_result, updated_velocity[n], n);
                         n++;
                     }
                     if(n >= acceleration_data.Length){

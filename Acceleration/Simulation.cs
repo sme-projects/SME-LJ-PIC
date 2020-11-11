@@ -81,12 +81,15 @@ namespace Acceleration{
                     if(i <= (uint)data_size -2 && j <= (uint)data_size -1){
                         double calc_result = calculated_result_queue.Dequeue();
                         double input_result = Funcs.FromUlong(testing_result_input.val);
+                        
+                        // Assertion for unittest
+                        System.Diagnostics.Debug.Assert((Math.Abs(calc_result - input_result) < 1/(Math.Pow(10,7))), "SME acceleration did not match C# acceleration");
 
-                        // TODO: Figure out what the expected and accepted difference can be
-                        if(Math.Abs(calc_result - input_result) > 1/(Math.Pow(10,7))){
-                            Console.WriteLine("pos {0}: {1}, pos {2}: {3}", i, positions[i], j, positions[j]);
-                            Console.WriteLine("Acceleration test sim - Got {0}, Expected {1}", input_result, calc_result);
-                        }
+                        // if(Math.Abs(calc_result - input_result) > 1/(Math.Pow(10,7))){
+                        //     Console.WriteLine("pos {0}: {1}, pos {2}: {3}", i, positions[i], j, positions[j]);
+                        //     Console.WriteLine("Acceleration test sim - Got {0}, Expected {1}", input_result, calc_result);
+                        // }
+                        
                         if(i >= data_size - 2){
                             running = false;
                             Console.WriteLine("Acceleration test successfully completed");

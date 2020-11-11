@@ -4,6 +4,10 @@
     <ProjectReference Include="/home/albt/git/sme/src/SME/SME.csproj" />
     <ProjectReference Include="../Deflib/Deflib.csproj"/>
     <ProjectReference Include="../Acceleration/Acceleration.csproj"/>
+    <ProjectReference Include="../Cache/Cache.csproj"/>
+    <ProjectReference Include="../Magnitude/Magnitude.csproj"/>
+    <ProjectReference Include="../Position_Update/Position_Update.csproj"/>
+    <ProjectReference Include="../Velocity_Update/Velocity_Update.csproj"/>
   </ItemGroup>
 
   <ItemGroup>

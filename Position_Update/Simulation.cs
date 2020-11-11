@@ -135,9 +135,14 @@ namespace Position_Update{
 
                     if(k-n > 2 || k >= random_velocity_data.Length){
                         double input_result = Funcs.FromUlong(data_point_ramresult.Data);
-                        if(updated_data_points[n] - input_result > 0.0f)
-                            Console.WriteLine("Update data result - Got {0}, expected {1} at {2}",
-                                    input_result, updated_data_points[n], n);
+
+                        // Assertion for unittest
+                        System.Diagnostics.Debug.Assert((Math.Abs(updated_data_points[n] - input_result) < 1/(Math.Pow(10,7))), "SME acceleration did not match C# position_update");
+
+
+                        // if(updated_data_points[n] - input_result > 0.0f)
+                        //     Console.WriteLine("Update data result - Got {0}, expected {1} at {2}",
+                        //             input_result, updated_data_points[n], n);
                         n++;
                     }
                     if(n >= random_velocity_data.Length){

@@ -63,9 +63,12 @@ namespace Magnitude
                         double calc_result = calculated_result_queue.Dequeue();
                         double input_result = Funcs.FromUlong(input.val);
 
-                        // TODO: Figure out what the expected and accepted difference can be
-                        if(Math.Abs(calc_result - input_result) > 1/(Math.Pow(10,7)))
-                            Console.WriteLine("Magnitude test sim - Got {0}, Expected {1}", input_result, calc_result);
+                        // Assertion for unittest
+                        System.Diagnostics.Debug.Assert((Math.Abs(calc_result - input_result) < 1/(Math.Pow(10,7))), "SME acceleration did not match C# magnitude");
+
+
+                        // if(Math.Abs(calc_result - input_result) > 1/(Math.Pow(10,7)))
+                        //     Console.WriteLine("Magnitude test sim - Got {0}, Expected {1}", input_result, calc_result);
                         
                         if(j >= (uint)data_size - 1){
                             running = false;

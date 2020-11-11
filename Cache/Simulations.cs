@@ -79,9 +79,12 @@ namespace Cache{
 
                 if(i-j >= 2 || (int)i >= positions.Length){
                     double input_result = Funcs.FromUlong(acc_ramresult.Data);
-                    if(test_accelerations[j] - input_result > 0.0f)
-                        Console.WriteLine("Acceleration result - Got {0}, expected {1} at pos {2}",
-                                input_result, test_accelerations[j], j);
+                    // Assertion for unittest
+                    System.Diagnostics.Debug.Assert((Math.Abs(test_accelerations[j] - input_result) < 1/(Math.Pow(10,7))), "SME cache did not match C# cache");
+                    
+                    // if(test_accelerations[j] - input_result > 0.0f)
+                    //     Console.WriteLine("Acceleration result - Got {0}, expected {1} at pos {2}",
+                    //             input_result, test_accelerations[j], j);
                     j++;
                 }
 

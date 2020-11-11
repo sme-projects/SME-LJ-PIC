@@ -93,77 +93,29 @@ namespace UnitTest
             RunTest(typeof(Acceleration.Program), true, false);
         }
 
-        // [TestMethod]
-        // public void RunColorBin()
-        // {
-        //     RunTest(typeof(ColorBin.ImageInputSimulator), true, false);
-        // }
+        [TestMethod]
+        public void RunCache()
+        {
+            RunTest(typeof(Cache.Program), true, false);
+        }
 
-        // [TestMethod]
-        // public void RunExternalComponent()
-        // {
-        //     RunTest(typeof(ExternalComponent.SimpleDualPortBlockRamTester<>), true, false);
-        // }
+        [TestMethod]
+        public void RunMagnitude()
+        {
+            RunTest(typeof(Magnitude.Program), true, false);
+        }
 
-        // [TestMethod]
-        // public void RunNoiseFilter()
-        // {
-        //     RunTest(typeof(NoiseFilter.ImageInputSimulator), true, false);
-        // }
+        [TestMethod]
+        public void RunPosition_Update()
+        {
+            RunTest(typeof(Position_Update.Program), true, false);
+        }
 
-        // [TestMethod]
-        // public void RunSimpleComponents()
-        // {
-        //     RunTest(typeof(SimpleComponents.ComponentTester), true, false);
-        // }
-
-        // [TestMethod]
-        // public void RunSimpleMemoryBus()
-        // {
-        //     RunTest(typeof(SimpleMemoryBus.MemoryTester), true, false);
-        // }
-
-        // [TestMethod]
-        // public void RunSimpleMIPS()
-        // {
-        //     RunTest(typeof(SimpleMIPS.Tester), true, false);
-        // }
-
-        // [TestMethod]
-        // public void RunSimpleNestedComponent()
-        // {
-        //     RunTest(typeof(SimpleNestedComponent.TestDriver), true, false);
-        // }
-
-        // [TestMethod]
-        // public void RunSimpleTrader()
-        // {
-        //     RunTest(typeof(SimpleTrader.ITraderInput), true, false);
-        // }
-
-        // [TestMethod]
-        // public void RunStatebasedCounter()
-        // {
-        //     RunTest(typeof(StatebasedCounter.MainClass), true, false);
-        // }
-
-        // [TestMethod]
-        // public void RunStatedAdder()
-        // {
-        //     RunTest(typeof(StatedAdder.Adder), true, false);
-        // }
-
-        // [TestMethod]
-        // public void RunStateMachineTester()
-        // {
-        //     RunTest(typeof(StateMachineTester.MainClass), true, false);
-        // }
-
-        // [TestMethod]
-        // public void RunStopwatch()
-        // {
-        //     RunTest(typeof(Stopwatch.MainClass), true, false);
-        // }
+        [TestMethod]
+        public void RunVelocity_Update()
+        {
+            RunTest(typeof(Velocity_Update.Program), true, false);
+        }
 
     }
 }
