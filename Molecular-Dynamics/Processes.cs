@@ -1,7 +1,7 @@
 using SME;
 using Deflib;
 
-namespace Lennard_Jones 
+namespace Molecular_Dynamics
 {
 
 

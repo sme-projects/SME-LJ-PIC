@@ -3,7 +3,7 @@ using SME.Components;
 using System;
 using Deflib;
 
-namespace Lennard_Jones
+namespace Molecular_Dynamics
 {
     class Program
     {
@@ -18,9 +18,9 @@ namespace Lennard_Jones
 
                 var simulation = new External_Sim(data_size, timestep_size);
 
-                var lennard = new LJ[(int)Deflib.Dimensions.n];
+                var lennard = new MD[(int)Deflib.Dimensions.n];
                 for (int i = 0; i < (int)Deflib.Dimensions.n; i++){
-                    lennard[i] = new LJ(data_size, timestep_size, magnitude.output);
+                    lennard[i] = new MD(data_size, timestep_size, magnitude.output);
                 }
 
                 for (int i = 0; i < (int)Deflib.Dimensions.n; i++)
@@ -59,21 +59,21 @@ namespace Lennard_Jones
 
 
 
-    public class LJ{
+    public class MD{
 
         public Acceleration.Acceleration acc;
-        public External_LJ_Sim sim;
+        public External_MD_Sim sim;
 
-        public LJ(ulong data_size, double timestep_size, ValBus mag_output){
+        public MD(ulong data_size, double timestep_size, ValBus mag_output){
             // RAM
             var position_ram = new TrueDualPortMemory<ulong>((int)data_size);
             var velocity_ram = new TrueDualPortMemory<ulong>((int)data_size);
             var acceleration_ram = new AccelerationDataRam(data_size);
             
             //External simulation process
-            var external_simulator = new External_LJ_Sim(data_size, timestep_size, (ulong)Cache_size.n);
+            var external_simulator = new External_MD_Sim(data_size, timestep_size, (ulong)Cache_size.n);
 
-            // Connect External_LJ_Simulation field with simulation proccess
+            // Connect External_MD_Simulation field with simulation proccess
             sim = external_simulator;
 
             // Managers

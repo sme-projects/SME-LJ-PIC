@@ -21,7 +21,7 @@ namespace Cache
             /* NOTE: The Cache running independently does not use the acceleration
             module and therefore the data stored in the cache are created by the 
             simulation. This also means that the cache results cannot be compared
-            to other LJ acceleration results when testing the cache module alone. */
+            to other MD acceleration results when testing the cache module alone. */
 
 
             for(ulong data_size = 12; data_size < 200; data_size = data_size * 2){

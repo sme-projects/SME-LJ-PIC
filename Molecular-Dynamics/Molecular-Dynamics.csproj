@@ -3,8 +3,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RootNamespace>Lennard_Jones</RootNamespace>
-    <StartupObject>Lennard_Jones.Program</StartupObject>
+    <RootNamespace>Molecular_Dynamics</RootNamespace>
+    <StartupObject>Molecular_Dynamics.Program</StartupObject>
     <!-- <DefaultItemExcludes>$(DefaultItemExcludes);Cache\**</DefaultItemExcludes>
     <DefaultItemExcludes>$(DefaultItemExcludes);Deflib\**</DefaultItemExcludes> -->
   </PropertyGroup>

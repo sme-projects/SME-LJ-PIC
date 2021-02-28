@@ -6,7 +6,7 @@ using Acceleration;
 
 using System.Linq;
 
-namespace Lennard_Jones 
+namespace Molecular_Dynamics
 {
 
         public class External_Sim : SimulationProcess
@@ -92,7 +92,7 @@ namespace Lennard_Jones
         }
     }
 
-    public class External_LJ_Sim : SimulationProcess
+    public class External_MD_Sim : SimulationProcess
     {
         [InputBus]
         public FlagBus finished;
@@ -127,7 +127,7 @@ namespace Lennard_Jones
         public FlagBus sim_finished = Scope.CreateBus<FlagBus>();
         
 
-        public External_LJ_Sim(ulong data_size, double timestep_size, ulong cache_size)
+        public External_MD_Sim(ulong data_size, double timestep_size, ulong cache_size)
         {
             this.data_size = (uint)data_size;
             this.timestep = timestep_size;
@@ -172,7 +172,7 @@ namespace Lennard_Jones
                 await ClockAsync();
             }
 
-            // LJ loop
+            // MD loop
             for(int k = 0; k < (uint)Number_of_loops.n; k++){
 
                 bool running = true;
