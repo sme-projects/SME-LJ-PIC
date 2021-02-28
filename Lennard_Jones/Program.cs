@@ -38,7 +38,7 @@ namespace Lennard_Jones
                 for (int i = 0; i < (int)Deflib.Dimensions.n; i++){
                     simulation.finished[i] = lennard[i].sim.sim_finished;
                 }
-                
+                int ticks = 0;
                 sim
                     .AddTopLevelInputs(simulation.init_velocity[0],
                                        simulation.init_velocity[1],
@@ -47,9 +47,11 @@ namespace Lennard_Jones
                                        simulation.init_position[1], 
                                        simulation.init_position[2])
                     .AddTopLevelOutputs(simulation.finished[0],simulation.finished[1],simulation.finished[2])
+                    .AddTicker(s => ticks++)
                     .BuildCSVFile()
-                    .BuildVHDL()
+                    // .BuildVHDL()
                     .Run();
+                Console.WriteLine($"number of ticks: {ticks}");
                 Console.WriteLine("Simulation completed");
             }
         }
